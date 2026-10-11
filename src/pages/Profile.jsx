@@ -18,6 +18,7 @@ function Profile() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [availabilitySaving, setAvailabilitySaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -96,6 +97,58 @@ function Profile() {
     setError("");
   }
 
+  async function handleAvailabilityChange() {
+    if (!profile || availabilitySaving) return;
+
+    setAvailabilitySaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        setError("Please log in again.");
+        return;
+      }
+
+      const newAvailability = !profile.availability;
+
+      const { data, error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          availability: newAvailability,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id)
+        .select("availability")
+        .single();
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setProfile((previous) => ({
+        ...previous,
+        availability: data.availability,
+      }));
+
+      setMessage(
+        data.availability
+          ? "You are now available as a donor!"
+          : "You are now unavailable as a donor.",
+      );
+    } catch {
+      setError("Something went wrong while updating availability.");
+    } finally {
+      setAvailabilitySaving(false);
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setSaving(true);
@@ -170,19 +223,8 @@ function Profile() {
         <h1 className="text-3xl font-bold text-gray-900">My Donor Profile</h1>
 
         <p className="mt-3 text-gray-600">
-          Complete your profile to help people find suitable donors.
+          Manage your donor information and availability.
         </p>
-
-        <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-4">
-          <p className="font-semibold text-gray-800">
-            Approval status: {profile.approval_status || "Pending"}
-          </p>
-
-          <p className="mt-1 text-sm text-gray-600">
-            Your donor profile must be approved by an administrator before it
-            can be listed as an approved donor.
-          </p>
-        </div>
 
         {message && (
           <p
@@ -202,10 +244,55 @@ function Profile() {
           </p>
         )}
 
+        {/* Donor Availability */}
+        <section className="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Donor Availability
+              </h2>
+
+              <p className="mt-1 text-sm text-gray-600">
+                {profile.availability
+                  ? "You are visible to people searching for available donors."
+                  : "You are not currently listed as an available donor."}
+              </p>
+
+              <p
+                className={`mt-2 font-semibold ${
+                  profile.availability ? "text-green-700" : "text-gray-500"
+                }`}
+              >
+                Status: {profile.availability ? "Available" : "Unavailable"}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAvailabilityChange}
+              disabled={availabilitySaving}
+              className={`rounded-lg px-5 py-3 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                profile.availability
+                  ? "bg-gray-600 hover:bg-gray-700"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              {availabilitySaving
+                ? "Updating..."
+                : profile.availability
+                  ? "Mark Unavailable"
+                  : "Mark Available"}
+            </button>
+          </div>
+        </section>
+
+        {/* Edit Donor Profile */}
         <form
           onSubmit={handleSubmit}
           className="mt-8 space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7"
         >
+          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+
           <div>
             <label
               htmlFor="full_name"
@@ -303,7 +390,7 @@ function Profile() {
                 htmlFor="upazila"
                 className="mb-2 block font-medium text-gray-700"
               >
-                Upazila
+                Upazila / Thana
               </label>
 
               <select
@@ -316,7 +403,9 @@ function Profile() {
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
               >
                 <option value="">
-                  {form.district ? "Select upazila" : "Select district first"}
+                  {form.district
+                    ? "Select upazila / thana"
+                    : "Select district first"}
                 </option>
 
                 {(locations[form.district] || []).map((upazila) => (
