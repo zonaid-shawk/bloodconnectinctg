@@ -9,6 +9,7 @@ import About from "./pages/About";
 import FindDonor from "./pages/FindDonor";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -18,14 +19,16 @@ function App() {
 
         <div className="flex-1">
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* Protected route */}
+            {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/find-donor" element={<FindDonor />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Routes>
         </div>

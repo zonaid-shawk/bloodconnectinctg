@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 function Home() {
   return (
     <main>
@@ -8,25 +9,28 @@ function Home() {
             <p className="mb-4 font-semibold uppercase tracking-wider text-red-600">
               Chittagong based Blood Donor Registration Hub
             </p>
-
             <h1 className="text-5xl font-bold leading-tight text-gray-900">
               Give Blood.
               <br />
               <span className="text-red-600">Save Lives.</span>
             </h1>
-
             <p className="mt-6 max-w-xl text-lg leading-8 text-gray-600">
               Humans are for Humans.{" "}
             </p>
-
             <div className="mt-8 flex flex-wrap gap-4">
-              <button className="rounded-lg bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700">
+              <Link
+                to="/find-donor"
+                className="rounded-lg bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
+              >
                 Find a Donor
-              </button>
+              </Link>
 
-              <button className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100">
+              <Link
+                to="/register"
+                className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
+              >
                 Become a Donor
-              </button>
+              </Link>
             </div>
           </div>
 
