@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { districts, locations } from "../data/chittagongLocations";
 
@@ -32,9 +33,7 @@ function FindDonor() {
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSearch(event) {
-    event.preventDefault();
-
+  async function searchDonors(filters) {
     setLoading(true);
     setError("");
     setDonors([]);
@@ -57,16 +56,16 @@ function FindDonor() {
           "id, full_name, phone, blood_group, district, upazila, availability",
         );
 
-      if (bloodGroup) {
-        query = query.eq("blood_group", bloodGroup);
+      if (filters.bloodGroup) {
+        query = query.eq("blood_group", filters.bloodGroup);
       }
 
-      if (district) {
-        query = query.eq("district", district);
+      if (filters.district) {
+        query = query.eq("district", filters.district);
       }
 
-      if (upazila) {
-        query = query.eq("upazila", upazila);
+      if (filters.upazila) {
+        query = query.eq("upazila", filters.upazila);
       }
 
       const { data, error: searchError } = await query.order("full_name");
@@ -83,6 +82,18 @@ function FindDonor() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleSearch(event) {
+    event.preventDefault();
+    return searchDonors({ bloodGroup, district, upazila });
+  }
+
+  function handleClearFilters() {
+    setBloodGroup("");
+    setDistrict("");
+    setUpazila("");
+    return searchDonors({ bloodGroup: "", district: "", upazila: "" });
   }
 
   function handleDistrictChange(event) {
@@ -220,9 +231,62 @@ function FindDonor() {
             </h2>
 
             {donors.length === 0 ? (
-              <p className="mt-4 rounded-lg border bg-white p-5 text-gray-600">
-                No available donors match your search. Try different filters.
-              </p>
+              <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5 text-gray-600 shadow-sm sm:p-6">
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+                      <circle
+                        cx="10.8"
+                        cy="10.8"
+                        r="6.8"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      />
+                      <path
+                        d="m16 16 4 4"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {bloodGroup || district || upazila
+                        ? "No donors match these filters"
+                        : "No donors are currently marked available"}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-gray-600">
+                      {bloodGroup || district || upazila
+                        ? "Try a different blood group or location, or search all available donors."
+                        : "Donors appear here after they create an account, complete their blood group and location, and mark themselves available in their profile."}
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      {(bloodGroup || district || upazila) && (
+                        <button
+                          type="button"
+                          onClick={handleClearFilters}
+                          disabled={loading}
+                          className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {loading
+                            ? "Searching..."
+                            : "Search all available donors"}
+                        </button>
+                      )}
+                      <Link
+                        to="/register"
+                        className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                      >
+                        Become a donor
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2">
                 {donors.map((donor) => {
