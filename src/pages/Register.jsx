@@ -1,11 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { districts, locations } from "../data/chittagongLocations";
+
+const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const genderOptions = ["Female", "Male", "Non-binary", "Prefer not to say"];
 
 function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [district, setDistrict] = useState("");
+  const [upazila, setUpazila] = useState("");
+  const [address, setAddress] = useState("");
+  const [lastDonationDate, setLastDonationDate] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [contactConsent, setContactConsent] = useState(false);
@@ -30,6 +41,12 @@ function Register() {
     "bg-amber-400",
     "bg-emerald-500",
   ];
+  const currentDate = new Date();
+  const today = [
+    currentDate.getFullYear(),
+    String(currentDate.getMonth() + 1).padStart(2, "0"),
+    String(currentDate.getDate()).padStart(2, "0"),
+  ].join("-");
 
   async function handleRegister(event) {
     event.preventDefault();
@@ -53,6 +70,36 @@ function Register() {
       setError(
         "Enter a valid Bangladesh mobile number, e.g. 01712345678 or +8801712345678.",
       );
+      return;
+    }
+
+    if (dateOfBirth > today) {
+      setError("Date of birth cannot be in the future.");
+      return;
+    }
+
+    if (!genderOptions.includes(gender)) {
+      setError("Please select a gender.");
+      return;
+    }
+
+    if (!bloodGroups.includes(bloodGroup)) {
+      setError("Please select a valid blood group.");
+      return;
+    }
+
+    if (!districts.includes(district)) {
+      setError("Please select a valid district.");
+      return;
+    }
+
+    if (!(locations[district] || []).includes(upazila)) {
+      setError("Please select a valid upazila or thana.");
+      return;
+    }
+
+    if (lastDonationDate && lastDonationDate > today) {
+      setError("Last donation date cannot be in the future.");
       return;
     }
 
@@ -80,6 +127,13 @@ function Register() {
             phone: normalizedPhone,
             whatsapp_number: normalizedPhone,
             whatsapp_contact_consent: contactConsent,
+            date_of_birth: dateOfBirth,
+            gender,
+            blood_group: bloodGroup,
+            district,
+            upazila,
+            address: address.trim() || null,
+            last_donation_date: lastDonationDate || null,
           },
         },
       });
@@ -101,6 +155,13 @@ function Register() {
       setFullName("");
       setEmail("");
       setWhatsapp("");
+      setDateOfBirth("");
+      setGender("");
+      setBloodGroup("");
+      setDistrict("");
+      setUpazila("");
+      setAddress("");
+      setLastDonationDate("");
       setPassword("");
       setContactConsent(false);
     } catch (err) {
@@ -322,6 +383,169 @@ function Register() {
                 </div>
                 <p className="mt-1.5 text-xs text-slate-500">
                   Bangladesh mobile number registered with WhatsApp.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="dateOfBirth"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    Date of birth
+                  </label>
+                  <input
+                    id="dateOfBirth"
+                    type="date"
+                    autoComplete="bday"
+                    max={today}
+                    value={dateOfBirth}
+                    onChange={(event) => setDateOfBirth(event.target.value)}
+                    required
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="gender"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    Gender
+                  </label>
+                  <select
+                    id="gender"
+                    value={gender}
+                    onChange={(event) => setGender(event.target.value)}
+                    required
+                    className={inputClassName}
+                  >
+                    <option value="">Select gender</option>
+                    {genderOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="bloodGroup"
+                  className="mb-1.5 block text-sm font-semibold text-slate-700"
+                >
+                  Blood group
+                </label>
+                <select
+                  id="bloodGroup"
+                  value={bloodGroup}
+                  onChange={(event) => setBloodGroup(event.target.value)}
+                  required
+                  className={inputClassName}
+                >
+                  <option value="">Select blood group</option>
+                  {bloodGroups.map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="district"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    District
+                  </label>
+                  <select
+                    id="district"
+                    value={district}
+                    onChange={(event) => {
+                      setDistrict(event.target.value);
+                      setUpazila("");
+                    }}
+                    required
+                    className={inputClassName}
+                  >
+                    <option value="">Select district</option>
+                    {districts.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="upazila"
+                    className="mb-1.5 block text-sm font-semibold text-slate-700"
+                  >
+                    Upazila / thana
+                  </label>
+                  <select
+                    id="upazila"
+                    value={upazila}
+                    onChange={(event) => setUpazila(event.target.value)}
+                    required
+                    disabled={!district}
+                    className={`${inputClassName} disabled:cursor-not-allowed disabled:bg-slate-100`}
+                  >
+                    <option value="">
+                      {district ? "Select upazila / thana" : "Select a district first"}
+                    </option>
+                    {(locations[district] || []).map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="address"
+                  className="mb-1.5 block text-sm font-semibold text-slate-700"
+                >
+                  Address{" "}
+                  <span className="font-normal text-slate-400">(optional)</span>
+                </label>
+                <textarea
+                  id="address"
+                  autoComplete="street-address"
+                  placeholder="Street, neighborhood, or nearby landmark"
+                  value={address}
+                  onChange={(event) => setAddress(event.target.value)}
+                  rows={2}
+                  className={`${inputClassName} resize-y`}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lastDonationDate"
+                  className="mb-1.5 block text-sm font-semibold text-slate-700"
+                >
+                  Last donation date{" "}
+                  <span className="font-normal text-slate-400">
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  id="lastDonationDate"
+                  type="date"
+                  max={today}
+                  value={lastDonationDate}
+                  onChange={(event) => setLastDonationDate(event.target.value)}
+                  className={inputClassName}
+                />
+                <p className="mt-1.5 text-xs text-slate-500">
+                  Leave blank if you have not donated before.
                 </p>
               </div>
 
