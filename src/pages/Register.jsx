@@ -15,13 +15,14 @@ function Register() {
 
   const passwordHasVariety =
     /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password);
-  const passwordStrength = password.length === 0
-    ? 0
-    : password.length >= 10 && passwordHasVariety
-      ? 3
-      : password.length >= 8
-        ? 2
-        : 1;
+  const passwordStrength =
+    password.length === 0
+      ? 0
+      : password.length >= 10 && passwordHasVariety
+        ? 3
+        : password.length >= 8
+          ? 2
+          : 1;
   const strengthLabels = ["", "Getting started", "Good", "Strong"];
   const strengthColors = [
     "bg-transparent",
@@ -149,7 +150,9 @@ function Register() {
                 />
               </svg>
             </span>
-            <span className="text-lg font-bold tracking-tight">BloodConnect</span>
+            <span className="text-lg font-bold tracking-tight">
+              BloodConnect
+            </span>
           </div>
 
           <div className="relative z-10 mt-10 flex flex-1 flex-col sm:mt-12 lg:mt-16">
@@ -209,9 +212,15 @@ function Register() {
 
             <div className="mt-auto flex items-center gap-3 border-t border-white/15 pt-5">
               <div className="flex -space-x-2" aria-hidden="true">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#a91436] bg-rose-100 text-[10px] font-bold text-[#a91436]">A</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#b71d3e] bg-amber-100 text-[10px] font-bold text-amber-800">R</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#a91436] bg-orange-100 text-[10px] font-bold text-orange-800">S</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#a91436] bg-rose-100 text-[10px] font-bold text-[#a91436]">
+                  A
+                </span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#b71d3e] bg-amber-100 text-[10px] font-bold text-amber-800">
+                  R
+                </span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#a91436] bg-orange-100 text-[10px] font-bold text-orange-800">
+                  S
+                </span>
               </div>
               <p className="text-xs leading-5 text-rose-100 sm:text-sm">
                 <span className="font-semibold text-white">Be part of it.</span>{" "}
@@ -338,7 +347,9 @@ function Register() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((visible) => !visible)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute inset-y-0 right-0 flex items-center px-4 text-xs font-semibold text-slate-500 transition hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-[-5px] focus-visible:outline-rose-500"
                   >
                     {showPassword ? "Hide" : "Show"}
@@ -360,7 +371,8 @@ function Register() {
                     </div>
                     <div className="mt-1.5 flex items-center justify-between text-[11px]">
                       <span className="text-slate-500">
-                        Use 6+ characters; a mix of letters and numbers is stronger.
+                        Use 6+ characters; a mix of letters and numbers is
+                        stronger.
                       </span>
                       <span className="ml-2 shrink-0 font-semibold text-slate-600">
                         {strengthLabels[passwordStrength]}
