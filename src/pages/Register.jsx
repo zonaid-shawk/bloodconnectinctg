@@ -5,7 +5,9 @@ import { supabase } from "../lib/supabase";
 function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [password, setPassword] = useState("");
+  const [contactConsent, setContactConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -21,8 +23,29 @@ function Register() {
       return;
     }
 
+    // Accept a Bangladesh mobile number such as 01712345678
+    // or an international-format number such as +8801712345678.
+    const normalizedPhone = whatsapp.replace(/[\s()-]/g, "");
+
+    const bangladeshMobile = /^01[3-9]\d{8}$/.test(normalizedPhone);
+    const internationalMobile = /^\+8801[3-9]\d{8}$/.test(normalizedPhone);
+
+    if (!bangladeshMobile && !internationalMobile) {
+      setError(
+        "Enter a valid Bangladesh mobile number, e.g. 01712345678 or +8801712345678.",
+      );
+      return;
+    }
+
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (!contactConsent) {
+      setError(
+        "Please confirm that you agree to share your WhatsApp number with approved users who need to contact you about blood donation.",
+      );
       return;
     }
 
@@ -35,6 +58,9 @@ function Register() {
         options: {
           data: {
             full_name: fullName.trim(),
+            phone: normalizedPhone,
+            whatsapp_number: normalizedPhone,
+            whatsapp_contact_consent: contactConsent,
           },
         },
       });
@@ -49,13 +75,15 @@ function Register() {
         );
       } else {
         setMessage(
-          "Registration successful! Please check your email to confirm your account.",
+          "Registration successful! Please check your email to confirm your account. Your donor profile will remain pending approval until reviewed.",
         );
       }
 
       setFullName("");
       setEmail("");
+      setWhatsapp("");
       setPassword("");
+      setContactConsent(false);
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -117,6 +145,31 @@ function Register() {
 
           <div>
             <label
+              htmlFor="whatsapp"
+              className="mb-2 block font-medium text-gray-700"
+            >
+              WhatsApp Number
+            </label>
+
+            <input
+              id="whatsapp"
+              type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              placeholder="01712345678"
+              value={whatsapp}
+              onChange={(event) => setWhatsapp(event.target.value)}
+              required
+              className="w-full rounded-lg border border-gray-300 px-4 py-3"
+            />
+
+            <p className="mt-1 text-xs text-gray-500">
+              Enter a Bangladesh mobile number registered with WhatsApp.
+            </p>
+          </div>
+
+          <div>
+            <label
               htmlFor="password"
               className="mb-2 block font-medium text-gray-700"
             >
@@ -135,6 +188,22 @@ function Register() {
               className="w-full rounded-lg border border-gray-300 px-4 py-3"
             />
           </div>
+
+          <label className="flex items-start gap-3 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={contactConsent}
+              onChange={(event) => setContactConsent(event.target.checked)}
+              className="mt-1"
+              required
+            />
+
+            <span>
+              I agree that my WhatsApp number may be shared with authorized
+              users seeking blood donors when my donor profile is approved and I
+              am marked available.
+            </span>
+          </label>
 
           {error && (
             <p
