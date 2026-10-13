@@ -67,6 +67,16 @@ function Navbar() {
           </Link>
 
           <Link
+            to="/dashboard"
+            className="font-medium text-gray-700 hover:text-red-600 flex items-center gap-1.5"
+          >
+            <span>Dashboard</span>
+            <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">
+              Stats
+            </span>
+          </Link>
+
+          <Link
             to="/about"
             className="font-medium text-gray-700 hover:text-red-600"
           >

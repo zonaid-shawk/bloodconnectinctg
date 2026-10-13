@@ -61,6 +61,96 @@ const initialDonors = [
     upazila: "Hathazari",
     availability: true,
   },
+  {
+    id: "donor-7",
+    full_name: "Shahadat Hossain",
+    phone: "01722889900",
+    blood_group: "B-",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Double Mooring",
+    availability: true,
+  },
+  {
+    id: "donor-8",
+    full_name: "Tasnim Ahmed",
+    phone: "01855667788",
+    blood_group: "AB-",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Chawkbazar",
+    availability: true,
+  },
+  {
+    id: "donor-9",
+    full_name: "Mohammad Zillur",
+    phone: "01933445566",
+    blood_group: "O+",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Agrabad",
+    availability: true,
+  },
+  {
+    id: "donor-10",
+    full_name: "Sadia Chowdhury",
+    phone: "01677889900",
+    blood_group: "B+",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Chandgaon",
+    availability: true,
+  },
+  {
+    id: "donor-11",
+    full_name: "Kamrul Hassan",
+    phone: "01799001122",
+    blood_group: "A+",
+    district: "Chattogram",
+    upazila: "Sitakunda",
+    availability: true,
+  },
+  {
+    id: "donor-12",
+    full_name: "Nahid Parvez",
+    phone: "01811223399",
+    blood_group: "O+",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Bakolia",
+    availability: true,
+  },
+  {
+    id: "donor-13",
+    full_name: "Taslima Nasreen",
+    phone: "01922334455",
+    blood_group: "B+",
+    district: "Chattogram",
+    upazila: "Anwara",
+    availability: false,
+  },
+  {
+    id: "donor-14",
+    full_name: "Jubair Ahmed",
+    phone: "01633445566",
+    blood_group: "AB+",
+    district: "Chattogram",
+    upazila: "Mirsharai",
+    availability: true,
+  },
+  {
+    id: "donor-15",
+    full_name: "Mehedi Hasan",
+    phone: "01744556677",
+    blood_group: "A-",
+    district: "Chattogram",
+    upazila: "Patiya",
+    availability: false,
+  },
+  {
+    id: "donor-16",
+    full_name: "Sharmin Sultana",
+    phone: "01888990011",
+    blood_group: "O-",
+    district: "Chattogram Metropolitan Area",
+    upazila: "Bayezid Bostami",
+    availability: true,
+  },
 ];
 
 const initialEmergencyRequests = [
@@ -118,7 +208,17 @@ function createMockSupabaseClient() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_PROFILES);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          const existingIds = new Set(parsed.map((p) => p.id));
+          const missing = initialDonors.filter((d) => !existingIds.has(d.id));
+          if (missing.length > 0) {
+            const merged = [...parsed, ...missing];
+            saveProfiles(merged);
+            return merged;
+          }
+          return parsed;
+        }
       }
     } catch {
       // ignore

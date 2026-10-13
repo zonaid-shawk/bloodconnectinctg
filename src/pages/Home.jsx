@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import DonorDashboard from "../components/DonorDashboard";
+
 function Home() {
   return (
     <main>
@@ -75,8 +77,39 @@ function Home() {
         </div>
       </section>
 
+      {/* Live Donor Analytics Dashboard with Bar Chart */}
+      <section className="border-y border-gray-200 bg-gray-50/70 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <p className="font-semibold uppercase tracking-wider text-red-600 text-xs">
+                LIVE REGISTRY STATS
+              </p>
+              <h2 className="mt-1 text-3xl font-black text-gray-900 tracking-tight">
+                Donor Distribution by Blood Type
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Visual breakdown of registered lifesavers across Chittagong ready for emergency transfusion.
+              </p>
+            </div>
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-1 text-sm font-bold text-red-600 hover:text-red-700"
+            >
+              Open Full Dashboard →
+            </Link>
+          </div>
+
+          <DonorDashboard
+            title="Registered Chittagong Blood Donors"
+            subtitle="Categorized by blood type with interactive bar analysis"
+            showActionLinks={false}
+          />
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
             <p className="font-semibold text-red-600">HOW IT WORKS</p>
