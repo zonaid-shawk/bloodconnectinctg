@@ -1,0 +1,7 @@
+{
+  "name": "BloodConnect",
+  "description": "Chittagong-based blood donor registration and search platform.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

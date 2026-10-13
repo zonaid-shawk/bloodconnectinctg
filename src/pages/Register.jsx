@@ -21,10 +21,8 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [contactConsent, setContactConsent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resendingConfirmation, setResendingConfirmation] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [pendingConfirmationEmail, setPendingConfirmationEmail] = useState("");
 
   const passwordHasVariety =
     /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password);
@@ -124,7 +122,6 @@ function Register() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: window.location.origin,
           data: {
             full_name: fullName.trim(),
             phone: normalizedPhone,
@@ -146,14 +143,12 @@ function Register() {
       }
 
       if (data.session) {
-        setPendingConfirmationEmail("");
         setMessage(
           "Account created successfully! Your donor profile is pending approval.",
         );
       } else {
-        setPendingConfirmationEmail(email.trim());
         setMessage(
-          `Your account was created and Supabase accepted a confirmation email request for ${email.trim()}. Check your inbox and spam folder. Your donor profile will remain pending approval until reviewed.`,
+          "Registration successful! Please check your email to confirm your account. Your donor profile will remain pending approval until reviewed.",
         );
       }
 
@@ -173,36 +168,6 @@ function Register() {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleResendConfirmation() {
-    if (!pendingConfirmationEmail || resendingConfirmation) return;
-
-    setResendingConfirmation(true);
-    setMessage("");
-    setError("");
-
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: pendingConfirmationEmail,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      setMessage(
-        `Supabase accepted another confirmation email request for ${pendingConfirmationEmail}. Check your inbox and spam folder.`,
-      );
-    } catch (err) {
-      setError(err.message || "Could not resend the confirmation email.");
-    } finally {
-      setResendingConfirmation(false);
     }
   }
 
@@ -666,24 +631,12 @@ function Register() {
               )}
 
               {message && (
-                <div
+                <p
                   role="status"
                   className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-5 text-emerald-800"
                 >
-                  <p>{message}</p>
-                  {pendingConfirmationEmail && (
-                    <button
-                      type="button"
-                      onClick={handleResendConfirmation}
-                      disabled={resendingConfirmation}
-                      className="mt-2 font-semibold underline underline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {resendingConfirmation
-                        ? "Requesting another email..."
-                        : "Resend confirmation email"}
-                    </button>
-                  )}
-                </div>
+                  {message}
+                </p>
               )}
 
               <button
