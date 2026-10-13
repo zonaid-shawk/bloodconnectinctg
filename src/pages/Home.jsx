@@ -62,14 +62,14 @@ function Home() {
 
           <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-8">
             {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
-              <div
+              <Link
                 key={group}
-                className="rounded-xl border bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:border-red-300"
+                to={`/find-donor?bloodGroup=${encodeURIComponent(group)}`}
+                className="group rounded-xl border bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:border-red-400 hover:shadow-md"
               >
-                <div className="text-2xl font-bold text-red-600">{group}</div>
-
-                <div className="mt-1 text-xs text-gray-500">Blood Group</div>
-              </div>
+                <div className="text-2xl font-bold text-red-600 group-hover:scale-105 transition-transform">{group}</div>
+                <div className="mt-1 text-xs text-gray-500">Find Donors</div>
+              </Link>
             ))}
           </div>
         </div>
