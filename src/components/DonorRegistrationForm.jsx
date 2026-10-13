@@ -2,17 +2,13 @@ import { useState, useId } from "react";
 
 import { districts, locations } from "../data/chittagongLocations";
 import { supabase } from "../lib/supabase";
+import {
+  validateBdPhone,
+  validateChittagongLocation,
+} from "../lib/donorValidation";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const GENDER_OPTIONS = ["Male", "Female", "Other", "Prefer not to say"];
-
-/**
- * Validates Bangladesh mobile number (e.g., 01712345678 or +8801712345678)
- */
-function isValidBdPhone(phone) {
-  const clean = phone.replace(/[\s()-]/g, "");
-  return /^01[3-9]\d{8}$/.test(clean) || /^\+8801[3-9]\d{8}$/.test(clean);
-}
 
 /**
  * Calculates eligibility based on last donation date (minimum 90 days)
@@ -91,22 +87,25 @@ export default function DonorRegistrationForm({
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = "Please enter a valid email address.";
     }
     if (name === "phone") {
-      if (!value.trim()) error = "Phone number is required.";
-      else if (!isValidBdPhone(value)) error = "Must be a valid Bangladesh mobile (e.g. 01712345678).";
+      const res = validateBdPhone(value, { required: true, fieldName: "Mobile number" });
+      if (!res.isValid) error = res.error;
     }
     if (name === "whatsapp") {
-      if (!allData.sameAsPhone && value.trim() && !isValidBdPhone(value)) {
-        error = "Invalid Bangladesh WhatsApp number.";
+      if (!allData.sameAsPhone && value.trim()) {
+        const res = validateBdPhone(value, { required: true, fieldName: "WhatsApp number" });
+        if (!res.isValid) error = res.error;
       }
     }
     if (name === "bloodGroup") {
       if (!value) error = "Please select a blood type.";
     }
     if (name === "district") {
-      if (!value) error = "Please select a district in Chittagong.";
+      const locRes = validateChittagongLocation(value, allData.upazila);
+      if (locRes.districtError) error = locRes.districtError;
     }
     if (name === "upazila") {
-      if (!value) error = "Please select an Upazila / Thana.";
+      const locRes = validateChittagongLocation(allData.district, value);
+      if (locRes.upazilaError) error = locRes.upazilaError;
     }
     if (name === "password" && showPassword) {
       if (!value) error = "Password is required.";
@@ -211,13 +210,31 @@ export default function DonorRegistrationForm({
     setLoading(true);
 
     try {
+      const phoneRes = validateBdPhone(formData.phone, { required: true, fieldName: "Mobile number" });
+      if (!phoneRes.isValid) {
+        setSubmitError(phoneRes.error);
+        setLoading(false);
+        return;
+      }
+
+      const waRes = formData.sameAsPhone
+        ? phoneRes
+        : validateBdPhone(formData.whatsapp, { required: false, fieldName: "WhatsApp number" });
+
+      const locRes = validateChittagongLocation(formData.district, formData.upazila);
+      if (!locRes.isValid) {
+        setSubmitError(locRes.districtError || locRes.upazilaError);
+        setLoading(false);
+        return;
+      }
+
       const donorPayload = {
         full_name: formData.fullName.trim(),
         email: formData.email.trim(),
-        phone: formData.phone.trim(),
+        phone: phoneRes.normalized,
         whatsapp_number: formData.sameAsPhone
-          ? formData.phone.trim()
-          : (formData.whatsapp.trim() || formData.phone.trim()),
+          ? phoneRes.normalized
+          : (waRes.normalized || phoneRes.normalized),
         blood_group: formData.bloodGroup,
         district: formData.district,
         upazila: formData.upazila,
@@ -582,8 +599,37 @@ export default function DonorRegistrationForm({
                 }`}
               />
             </div>
-            {errors.phone && touched.phone && (
-              <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+            {errors.phone && touched.phone ? (
+              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+                <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{errors.phone}</span>
+              </p>
+            ) : (
+              (() => {
+                const phoneStatus = validateBdPhone(formData.phone, { required: false });
+                if (phoneStatus.isValid && phoneStatus.operator) {
+                  return (
+                    <div className="mt-1.5 flex items-center gap-2 text-xs">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700 ring-1 ring-emerald-600/20">
+                        <svg className="h-3 w-3 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        {phoneStatus.operator}
+                      </span>
+                      <span className="text-gray-500 font-mono">
+                        Standard: {phoneStatus.formatted}
+                      </span>
+                    </div>
+                  );
+                }
+                return (
+                  <p className="mt-1 text-[11px] text-gray-500">
+                    Standard 11 digits starting with 013-019 (e.g. 01712-345678)
+                  </p>
+                );
+              })()
             )}
           </div>
 
@@ -640,8 +686,29 @@ export default function DonorRegistrationForm({
                 onBlur={handleBlur}
                 className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-500"
               />
-              {errors.whatsapp && (
-                <p className="mt-1 text-xs text-red-600">{errors.whatsapp}</p>
+              {errors.whatsapp && touched.whatsapp ? (
+                <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                  <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span>{errors.whatsapp}</span>
+                </p>
+              ) : (
+                (() => {
+                  const waStatus = validateBdPhone(formData.whatsapp, { required: false });
+                  if (waStatus.isValid && waStatus.operator) {
+                    return (
+                      <p className="mt-1 text-xs text-emerald-700">
+                        ✓ {waStatus.operator} ({waStatus.formatted})
+                      </p>
+                    );
+                  }
+                  return (
+                    <p className="mt-1 text-[11px] text-gray-500">
+                      e.g. 01812345678 (11 digits with Bangladesh operator code)
+                    </p>
+                  );
+                })()
               )}
             </div>
           )}

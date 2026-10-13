@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { districts, locations } from "../data/chittagongLocations";
+import { validateBdPhone, validateChittagongLocation } from "../lib/donorValidation";
 
 const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -166,13 +167,19 @@ function Profile() {
         return;
       }
 
-      if (!districts.includes(form.district)) {
-        setError("Please select a valid district.");
-        return;
+      let normalizedPhone = null;
+      if (form.phone && form.phone.trim()) {
+        const phoneCheck = validateBdPhone(form.phone, { required: true, fieldName: "Phone number" });
+        if (!phoneCheck.isValid) {
+          setError(phoneCheck.error);
+          return;
+        }
+        normalizedPhone = phoneCheck.normalized;
       }
 
-      if (!(locations[form.district] || []).includes(form.upazila)) {
-        setError("Please select a valid upazila.");
+      const locCheck = validateChittagongLocation(form.district, form.upazila);
+      if (!locCheck.isValid) {
+        setError(locCheck.districtError || locCheck.upazilaError);
         return;
       }
 
@@ -180,7 +187,7 @@ function Profile() {
         .from("profiles")
         .update({
           full_name: form.full_name.trim(),
-          phone: form.phone.trim() || null,
+          phone: normalizedPhone,
           blood_group: form.blood_group || null,
           district: form.district,
           upazila: form.upazila,
@@ -331,6 +338,27 @@ function Profile() {
               placeholder="Enter your phone number"
               className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
             />
+            {form.phone && (() => {
+              const status = validateBdPhone(form.phone, { required: false });
+              if (status.isValid && status.operator) {
+                return (
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-700">
+                    <span className="font-semibold rounded-md bg-emerald-50 px-2 py-0.5 ring-1 ring-emerald-600/20">
+                      ✓ {status.operator}
+                    </span>
+                    <span className="text-gray-500 font-mono">{status.formatted}</span>
+                  </p>
+                );
+              }
+              if (form.phone.trim()) {
+                return (
+                  <p className="mt-1.5 text-xs text-amber-600">
+                    Standard 11 digits starting with 013-019 (e.g. 01712-345678)
+                  </p>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           <div>
