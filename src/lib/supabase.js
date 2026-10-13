@@ -63,9 +63,55 @@ const initialDonors = [
   },
 ];
 
+const initialEmergencyRequests = [
+  {
+    id: "req-1",
+    patient_name: "Fatima Begum",
+    blood_group: "O+",
+    bags_needed: 2,
+    hospital: "Chittagong Medical College Hospital (CMCH)",
+    district: "Chattogram",
+    upazila: "Panchlaish",
+    phone: "01819876543",
+    urgent: true,
+    reason: "Emergency cardiac surgery, Ward 26",
+    status: "active",
+    created_at: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "req-2",
+    patient_name: "Abdul Karim",
+    blood_group: "A-",
+    bags_needed: 1,
+    hospital: "Parkview Hospital, Chittagong",
+    district: "Chattogram",
+    upazila: "Panchlaish",
+    phone: "01711223344",
+    urgent: true,
+    reason: "Severe anemia / Thalassemia crisis",
+    status: "active",
+    created_at: new Date(Date.now() - 75 * 60 * 1000).toISOString(),
+  },
+  {
+    id: "req-3",
+    patient_name: "Rashedul Alam",
+    blood_group: "B+",
+    bags_needed: 3,
+    hospital: "Imperial Hospital Chittagong",
+    district: "Chattogram",
+    upazila: "Pahartali",
+    phone: "01912345678",
+    urgent: true,
+    reason: "Accident trauma care, ICU Unit",
+    status: "active",
+    created_at: new Date(Date.now() - 140 * 60 * 1000).toISOString(),
+  },
+];
+
 function createMockSupabaseClient() {
   const STORAGE_KEY_PROFILES = "bloodconnect_profiles";
   const STORAGE_KEY_SESSION = "bloodconnect_session";
+  const STORAGE_KEY_REQUESTS = "bloodconnect_emergency_requests";
   const authListeners = new Set();
 
   function loadProfiles() {
@@ -83,6 +129,26 @@ function createMockSupabaseClient() {
   function saveProfiles(profiles) {
     try {
       localStorage.setItem(STORAGE_KEY_PROFILES, JSON.stringify(profiles));
+    } catch {
+      // ignore
+    }
+  }
+
+  function loadRequests() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_REQUESTS);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // ignore
+    }
+    return [...initialEmergencyRequests];
+  }
+
+  function saveRequests(reqs) {
+    try {
+      localStorage.setItem(STORAGE_KEY_REQUESTS, JSON.stringify(reqs));
     } catch {
       // ignore
     }
@@ -132,9 +198,11 @@ function createMockSupabaseClient() {
       this.tableName = tableName;
       this.filters = [];
       this.updatePayload = null;
+      this.insertPayload = null;
       this.selectFields = "*";
       this.isSingle = false;
       this.sortField = null;
+      this.sortAscending = true;
     }
 
     select(fields = "*") {
@@ -147,8 +215,9 @@ function createMockSupabaseClient() {
       return this;
     }
 
-    order(field) {
+    order(field, options = {}) {
       this.sortField = field;
+      this.sortAscending = options?.ascending ?? true;
       return this;
     }
 
@@ -162,7 +231,64 @@ function createMockSupabaseClient() {
       return this;
     }
 
+    insert(payload) {
+      this.insertPayload = Array.isArray(payload) ? payload : [payload];
+      return this;
+    }
+
     execute() {
+      // Handling emergency_requests
+      if (this.tableName === "emergency_requests") {
+        let reqsStore = loadRequests();
+
+        if (this.insertPayload) {
+          const newItems = this.insertPayload.map((item) => ({
+            id: item.id || `req-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            urgent: item.urgent !== false,
+            status: item.status || "active",
+            created_at: item.created_at || new Date().toISOString(),
+            ...item,
+          }));
+          reqsStore = [...newItems, ...reqsStore];
+          saveRequests(reqsStore);
+          return { data: newItems, error: null };
+        }
+
+        if (this.updatePayload) {
+          let updatedItem = null;
+          reqsStore = reqsStore.map((item) => {
+            const match = this.filters.every((f) => item[f.field] === f.value);
+            if (match) {
+              updatedItem = { ...item, ...this.updatePayload };
+              return updatedItem;
+            }
+            return item;
+          });
+          saveRequests(reqsStore);
+          if (this.isSingle) return { data: updatedItem || {}, error: null };
+          return { data: [updatedItem], error: null };
+        }
+
+        let results = [...reqsStore];
+        for (const filter of this.filters) {
+          if (filter.value !== undefined && filter.value !== "") {
+            results = results.filter((item) => item[filter.field] === filter.value);
+          }
+        }
+
+        // Default sort: urgent first, then newest
+        results.sort((a, b) => {
+          if (a.urgent && !b.urgent) return -1;
+          if (!a.urgent && b.urgent) return 1;
+          return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+
+        if (this.isSingle) {
+          return { data: results[0] || null, error: results[0] ? null : { message: "Not found" } };
+        }
+        return { data: results, error: null };
+      }
+
       profilesStore = loadProfiles();
 
       if (this.updatePayload) {

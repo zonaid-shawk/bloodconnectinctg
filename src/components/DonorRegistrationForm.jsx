@@ -6,6 +6,8 @@ import {
   validateBdPhone,
   validateChittagongLocation,
 } from "../lib/donorValidation";
+import RegistrationSuccessModal from "./RegistrationSuccessModal";
+import Toast from "./Toast";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const GENDER_OPTIONS = ["Male", "Female", "Other", "Prefer not to say"];
@@ -73,6 +75,8 @@ export default function DonorRegistrationForm({
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [registeredDonor, setRegisteredDonor] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -266,6 +270,8 @@ export default function DonorRegistrationForm({
 
       setRegisteredDonor(donorPayload);
       setSubmitSuccess(true);
+      setIsModalOpen(true);
+      setToastMessage(`Registration successful! Welcome ${donorPayload.full_name} to BloodConnect Chittagong.`);
       if (onSuccess) {
         onSuccess(donorPayload);
       }
@@ -277,79 +283,137 @@ export default function DonorRegistrationForm({
     }
   }
 
+  function handleResetForm() {
+    setSubmitSuccess(false);
+    setIsModalOpen(false);
+    setRegisteredDonor(null);
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      whatsapp: "",
+      sameAsPhone: true,
+      bloodGroup: "O+",
+      district: defaultDistrict,
+      upazila: locations[defaultDistrict]?.[0] || "",
+      address: "",
+      gender: "Male",
+      dateOfBirth: "",
+      lastDonationDate: "",
+      password: "",
+      isAvailable: true,
+      consent: true,
+    });
+    setTouched({});
+    setErrors({});
+    setSubmitError("");
+  }
+
   const eligibility = getDonationEligibility(formData.lastDonationDate);
 
   if (submitSuccess && registeredDonor) {
     return (
-      <div className={`rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm md:p-8 ${className}`}>
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-            <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8 stroke-current stroke-2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+      <>
+        <RegistrationSuccessModal
+          isOpen={isModalOpen}
+          donor={registeredDonor}
+          onClose={() => setIsModalOpen(false)}
+          onRegisterAnother={handleResetForm}
+        />
 
-          <h2 className="mt-4 text-2xl font-bold text-gray-900">Registration Successful!</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Thank you, <span className="font-semibold text-gray-800">{registeredDonor.full_name}</span>.
-            Your donor registration for Chittagong has been recorded.
-          </p>
+        <Toast
+          message={toastMessage}
+          type="success"
+          duration={5000}
+          onClose={() => setToastMessage("")}
+        />
 
-          <div className="mt-6 w-full max-w-md rounded-xl border border-gray-100 bg-gray-50 p-4 text-left">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blood Type</p>
-                <p className="text-2xl font-extrabold text-red-600">{registeredDonor.blood_group}</p>
-              </div>
-              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-                {registeredDonor.availability ? "Active Donor" : "Inactive"}
-              </span>
+        <div className={`rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm md:p-8 ${className}`}>
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600 shadow-inner">
+              <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8 stroke-current stroke-2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-              <div>
-                <p className="text-xs text-gray-500">Location</p>
-                <p className="font-medium text-gray-800">{registeredDonor.upazila}, {registeredDonor.district}</p>
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-600/20">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              Active Chittagong Donor
+            </span>
+
+            <h2 className="mt-2 text-2xl font-bold text-gray-900">Registration Successful!</h2>
+            <p className="mt-2 text-sm text-gray-600 max-w-md">
+              Thank you, <span className="font-semibold text-gray-800">{registeredDonor.full_name}</span>.
+              Your donor profile is active and discoverable by patients across Chittagong.
+            </p>
+
+            <div className="mt-6 w-full max-w-md rounded-2xl border border-gray-100 bg-gray-50/80 p-5 text-left shadow-sm">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-3.5">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blood Type</p>
+                  <p className="text-2xl font-extrabold text-red-600">{registeredDonor.blood_group}</p>
+                </div>
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                  {registeredDonor.availability ? "Available to Donate" : "Inactive"}
+                </span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500">Contact</p>
-                <p className="font-medium text-gray-800">{registeredDonor.phone}</p>
+
+              <div className="mt-3.5 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-gray-500">Location</p>
+                  <p className="font-medium text-gray-800 truncate">{registeredDonor.upazila}, {registeredDonor.district}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Contact</p>
+                  <p className="font-medium font-mono text-gray-800 truncate">{registeredDonor.phone}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setSubmitSuccess(false);
-              setRegisteredDonor(null);
-              setFormData((prev) => ({
-                ...prev,
-                fullName: "",
-                email: "",
-                phone: "",
-                whatsapp: "",
-                address: "",
-                password: "",
-              }));
-              setTouched({});
-              setErrors({});
-            }}
-            className="mt-6 rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-red-700"
-          >
-            Register Another Donor
-          </button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
+              >
+                View Full Confirmation
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetForm}
+                className="rounded-xl bg-red-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
+              >
+                Register Another Donor
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className={`rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 ${className}`}
-    >
+    <>
+      <RegistrationSuccessModal
+        isOpen={isModalOpen}
+        donor={registeredDonor}
+        onClose={() => setIsModalOpen(false)}
+        onRegisterAnother={handleResetForm}
+      />
+
+      <Toast
+        message={toastMessage}
+        type="success"
+        duration={5000}
+        onClose={() => setToastMessage("")}
+      />
+
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className={`rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 ${className}`}
+      >
       {!hideHeader && (
         <div className="border-b border-gray-100 pb-4">
           <div className="flex items-center gap-2.5">
@@ -863,6 +927,7 @@ export default function DonorRegistrationForm({
         </button>
       </div>
     </form>
-  );
+  </>
+);
 }
 

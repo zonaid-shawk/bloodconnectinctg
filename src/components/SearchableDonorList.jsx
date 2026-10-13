@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { districts, locations } from "../data/chittagongLocations";
 import { supabase } from "../lib/supabase";
+import EmergencyRequestModal from "./EmergencyRequestModal";
+import Toast from "./Toast";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -18,6 +20,21 @@ function getWhatsAppNumber(phone) {
     return clean;
   }
   return "";
+}
+
+/**
+ * Relative time formatter for emergency requests
+ */
+function formatTimeAgo(dateString) {
+  if (!dateString) return "Recently";
+  const now = Date.now();
+  const date = new Date(dateString).getTime();
+  const diffMinutes = Math.max(1, Math.floor((now - date) / (1000 * 60)));
+  if (diffMinutes < 5) return "Just now";
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.floor(diffHours / 24)}d ago`;
 }
 
 export default function SearchableDonorList({
@@ -44,12 +61,16 @@ export default function SearchableDonorList({
   const [sortBy, setSortBy] = useState("name_asc");
 
   const [donors, setDonors] = useState([]);
+  const [emergencyRequests, setEmergencyRequests] = useState([]);
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copiedPhone, setCopiedPhone] = useState(null);
   const [refreshCount, setRefreshCount] = useState(0);
 
-  // Load donors when filters change
+  // Load donors and emergency blood requests
   useEffect(() => {
     let active = true;
 
@@ -67,19 +88,26 @@ export default function SearchableDonorList({
           query = query.eq("upazila", selectedUpazila);
         }
 
-        const { data, error: fetchErr } = await query.order("full_name");
+        const [donorsRes, reqsRes] = await Promise.all([
+          query.order("full_name"),
+          supabase.from("emergency_requests").select("*"),
+        ]);
 
         if (!active) return;
 
-        if (fetchErr) {
+        if (donorsRes.error) {
           setError("Unable to load donors. Please try again.");
         } else {
-          setDonors(data || []);
+          setDonors(donorsRes.data || []);
           setError("");
+        }
+
+        if (reqsRes.data) {
+          setEmergencyRequests(reqsRes.data);
         }
       } catch (err) {
         if (!active) return;
-        console.error("Error loading donors:", err);
+        console.error("Error loading donors & requests:", err);
         setError("Unable to load donors. Please try again.");
       } finally {
         if (active) {
@@ -116,6 +144,27 @@ export default function SearchableDonorList({
     setTimeout(() => {
       setCopiedPhone(null);
     }, 2000);
+  }
+
+  async function handleMarkFulfilled(requestId) {
+    try {
+      await supabase
+        .from("emergency_requests")
+        .update({ status: "fulfilled" })
+        .eq("id", requestId);
+
+      setEmergencyRequests((prev) =>
+        prev.map((r) => (r.id === requestId ? { ...r, status: "fulfilled" } : r))
+      );
+      setToastMessage("Emergency request marked as fulfilled. Thank you!");
+    } catch (err) {
+      console.error("Error updating request status:", err);
+    }
+  }
+
+  function handleEmergencyRequestSuccess(newReq) {
+    setEmergencyRequests((prev) => [newReq, ...prev]);
+    setToastMessage(`Emergency blood request for ${newReq.patient_name} pinned to top of search.`);
   }
 
   // Filter in-memory for keyword search & availability, and apply sorting
@@ -157,6 +206,42 @@ export default function SearchableDonorList({
     return result;
   }, [donors, searchTerm, onlyAvailable, sortBy]);
 
+  // Filter emergency requests based on blood group, district, upazila, keyword
+  const filteredEmergencyRequests = useMemo(() => {
+    let list = emergencyRequests.filter((r) => r.status !== "fulfilled");
+
+    if (selectedBloodGroup) {
+      list = list.filter((r) => r.blood_group === selectedBloodGroup);
+    }
+    if (selectedDistrict) {
+      list = list.filter((r) => r.district === selectedDistrict);
+    }
+    if (selectedUpazila) {
+      list = list.filter((r) => r.upazila === selectedUpazila);
+    }
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      list = list.filter((r) => {
+        return (
+          (r.patient_name || "").toLowerCase().includes(q) ||
+          (r.hospital || "").toLowerCase().includes(q) ||
+          (r.reason || "").toLowerCase().includes(q) ||
+          (r.blood_group || "").toLowerCase().includes(q)
+        );
+      });
+    }
+
+    // Rank: Urgent requests flagged as 'urgent' ALWAYS on top, then by recency
+    list.sort((a, b) => {
+      if (a.urgent && !b.urgent) return -1;
+      if (!a.urgent && b.urgent) return 1;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+
+    return list;
+  }, [emergencyRequests, selectedBloodGroup, selectedDistrict, selectedUpazila, searchTerm]);
+
   const hasActiveFilters =
     Boolean(searchTerm) ||
     Boolean(selectedBloodGroup) ||
@@ -165,23 +250,51 @@ export default function SearchableDonorList({
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Header (optional) */}
+      {/* EMERGENCY REQUEST MODAL */}
+      <EmergencyRequestModal
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setIsEmergencyModalOpen(false)}
+        onSuccess={handleEmergencyRequestSuccess}
+        defaultBloodGroup={selectedBloodGroup || "O+"}
+        defaultDistrict={selectedDistrict || "Chattogram"}
+      />
+
+      {/* TOAST ALERT */}
+      <Toast
+        message={toastMessage}
+        type="success"
+        duration={5000}
+        onClose={() => setToastMessage("")}
+      />
+
+      {/* Header */}
       {showTitle && (
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
               Chittagong Blood Donors
             </h2>
             <p className="text-sm text-gray-600">
-              Browse and connect with registered blood donors in Chittagong
+              Browse available donors and live emergency blood requests across Chittagong
             </p>
           </div>
-          <Link
-            to="/register"
-            className="inline-flex items-center justify-center gap-1.5 self-start rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700"
-          >
-            <span>+ Become a Donor</span>
-          </Link>
+
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsEmergencyModalOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm ring-2 ring-red-600/30 transition hover:bg-red-700"
+            >
+              <span>🚨 Request Blood Urgently</span>
+            </button>
+
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+            >
+              <span>+ Become a Donor</span>
+            </Link>
+          </div>
         </div>
       )}
 
@@ -197,7 +310,7 @@ export default function SearchableDonorList({
           <input
             id={`${componentId}-search`}
             type="text"
-            placeholder="Search by donor name, area, phone number..."
+            placeholder="Search by donor name, area, hospital, phone number..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-gray-300 bg-gray-50/50 py-3 pl-11 pr-10 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-100"
@@ -366,14 +479,155 @@ export default function SearchableDonorList({
         </div>
       )}
 
+      {/* ======================================================== */}
+      {/* EMERGENCY BLOOD REQUESTS (FLAGGED AS URGENT ON TOP)      */}
+      {/* ======================================================== */}
+      <section aria-labelledby="urgent-requests-heading" className="space-y-3.5">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-red-100 text-red-600 text-sm shadow-inner">
+              🚨
+            </span>
+            <h3 id="urgent-requests-heading" className="text-base font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+              <span>Emergency Blood Requests</span>
+              {filteredEmergencyRequests.length > 0 && (
+                <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-black text-white">
+                  {filteredEmergencyRequests.length} Active
+                </span>
+              )}
+            </h3>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsEmergencyModalOpen(true)}
+            className="text-xs font-bold text-red-600 hover:text-red-700 hover:underline inline-flex items-center gap-1"
+          >
+            <span>+ Post Emergency Need</span>
+          </button>
+        </div>
+
+        {filteredEmergencyRequests.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {filteredEmergencyRequests.map((req) => {
+              const waNumber = getWhatsAppNumber(req.phone);
+              const waMessage = `Assalamu Alaikum, I saw your urgent request on BloodConnect for ${req.blood_group} blood at ${req.hospital}. I would like to help donate...`;
+              const waLink = waNumber
+                ? `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`
+                : "";
+
+              return (
+                <article
+                  key={req.id}
+                  className="relative overflow-hidden rounded-2xl border-2 border-red-300 bg-gradient-to-br from-red-50/90 via-rose-50/40 to-white p-5 shadow-sm ring-1 ring-red-400/20 transition hover:border-red-400 hover:shadow-md"
+                >
+                  {/* Top Emergency Beacon */}
+                  <div className="flex items-center justify-between gap-2 border-b border-red-200/70 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600" />
+                      </span>
+                      <span className="text-xs font-black uppercase tracking-wider text-red-700">
+                        {req.urgent ? "URGENT EMERGENCY" : "Blood Request"}
+                      </span>
+                    </div>
+
+                    <span className="text-[11px] font-medium text-gray-500">
+                      {formatTimeAgo(req.created_at)}
+                    </span>
+                  </div>
+
+                  {/* Main Details */}
+                  <div className="mt-3.5 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h4 className="text-base font-bold text-gray-900 truncate">
+                        {req.patient_name}
+                      </h4>
+                      <p className="mt-0.5 text-xs font-semibold text-gray-700 flex items-center gap-1 truncate">
+                        <svg className="h-3.5 w-3.5 text-red-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span className="truncate">{req.hospital}</span>
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {req.upazila ? `${req.upazila}, ` : ""}{req.district || "Chattogram"}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center shrink-0 rounded-2xl bg-red-600 px-3.5 py-2 text-white shadow-sm ring-2 ring-red-600/30">
+                      <span className="text-xl font-black leading-none">{req.blood_group}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-200">
+                        {req.bags_needed || 1} {req.bags_needed === 1 ? "Bag" : "Bags"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Reason / Context */}
+                  {req.reason && (
+                    <div className="mt-3 rounded-xl bg-white/90 border border-red-200/60 p-2.5 text-xs text-red-900 font-medium">
+                      <span className="font-bold text-red-700">Urgency Note:</span> {req.reason}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="mt-4 flex items-center gap-2 pt-3 border-t border-red-200/50">
+                    {waLink && (
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700"
+                      >
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M20.52 3.48A11.86 11.86 0 0 0 12.08 0C5.5 0 .15 5.34.15 11.91c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.94 11.94 0 0 0 5.78 1.47h.01c6.57 0 11.91-5.35 11.91-11.92 0-3.18-1.24-6.17-3.48-8.42ZM12.09 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98.99-3.65-.24-.37a9.83 9.83 0 0 1-1.51-5.26c0-5.47 4.45-9.91 9.92-9.91a9.84 9.84 0 0 1 7.01 2.91 9.84 9.84 0 0 1 2.9 7.01c0 5.47-4.45 9.92-9.93 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.96 1.17-.18.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.47-1.74-1.65-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.68-1.64-.93-2.25-.24-.58-.49-.5-.68-.51l-.58-.01c-.2 0-.53.07-.81.38-.28.3-1.06 1.03-1.06 2.51 0 1.48 1.09 2.91 1.24 3.11.15.2 2.13 3.25 5.15 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.73 2.02-1.43.25-.71.25-1.31.17-1.43-.07-.13-.27-.2-.57-.35Z" />
+                        </svg>
+                        <span>WhatsApp</span>
+                      </a>
+                    )}
+
+                    <a
+                      href={`tel:${req.phone}`}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-red-700"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <span>Call Now</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => handleMarkFulfilled(req.id)}
+                      className="rounded-xl border border-gray-300 bg-white px-2.5 py-2 text-[11px] font-medium text-gray-600 hover:bg-gray-50 transition"
+                      title="Mark as fulfilled"
+                    >
+                      Fulfilled
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/70 p-4 text-center">
+            <p className="text-xs text-gray-500">
+              No active emergency requests
+              {selectedBloodGroup ? ` for blood group ${selectedBloodGroup}` : ""}{" "}
+              at this moment.
+            </p>
+          </div>
+        )}
+      </section>
+
       {/* RESULTS COUNT */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 pt-2">
         <p className="text-sm font-semibold text-gray-700">
           {loading ? (
             "Searching donors in Chittagong..."
           ) : (
             <>
-              Found{" "}
+              Available Donors:{" "}
               <span className="font-bold text-red-600">{filteredDonors.length}</span>{" "}
               {filteredDonors.length === 1 ? "donor" : "donors"}
               {selectedDistrict ? ` in ${selectedDistrict}` : " in Chittagong"}
