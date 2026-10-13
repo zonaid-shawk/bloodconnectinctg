@@ -3,8 +3,8 @@ import DonorRegistrationForm from "../components/DonorRegistrationForm";
 
 function Register() {
   return (
-    <main className="bg-[#f7f5f2] px-4 py-8 sm:px-6 sm:py-12">
-      <div className="mx-auto grid min-h-[720px] w-full max-w-6xl overflow-hidden rounded-[28px] bg-white shadow-[0_24px_80px_-36px_rgba(73,26,34,0.28)] lg:grid-cols-[0.85fr_1.15fr]">
+    <main className="bg-[#f7f5f2] px-4 py-8 transition-colors duration-200 dark:bg-gray-950 sm:px-6 sm:py-12">
+      <div className="mx-auto grid min-h-[720px] w-full max-w-6xl overflow-hidden rounded-[28px] bg-white shadow-[0_24px_80px_-36px_rgba(73,26,34,0.28)] dark:border dark:border-gray-800 dark:bg-gray-900 lg:grid-cols-[0.85fr_1.15fr]">
         <aside className="relative flex min-h-[300px] flex-col overflow-hidden bg-gradient-to-br from-[#a91436] via-[#c32143] to-[#7c1531] px-7 py-8 text-white sm:px-10 sm:py-10 lg:min-h-full lg:px-12 lg:py-12">
           <div
             aria-hidden="true"
@@ -122,13 +122,13 @@ function Register() {
         <section className="flex flex-col justify-center px-6 py-9 sm:px-10 sm:py-12 lg:px-12">
           <div className="w-full">
             <div className="mb-6">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-600">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-600 dark:text-rose-400">
                 Join the community
               </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-[2.1rem]">
+              <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-[2.1rem]">
                 Become a donor
               </h1>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
+              <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-gray-400">
                 Register as a blood donor in Chittagong and take the first step toward saving lives.
               </p>
             </div>
@@ -138,17 +138,17 @@ function Register() {
               className="border-0 shadow-none p-0 md:p-0 rounded-none bg-transparent"
             />
 
-            <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500">
+            <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-slate-500 dark:text-gray-400">
               <span>Already have an account?</span>
               <Link
                 to="/login"
-                className="font-bold text-rose-700 decoration-rose-300 underline-offset-4 transition hover:text-rose-900 hover:underline"
+                className="font-bold text-rose-700 decoration-rose-300 underline-offset-4 transition hover:text-rose-900 hover:underline dark:text-rose-400 dark:hover:text-rose-300"
               >
                 Log in
               </Link>
             </div>
 
-            <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400">
+            <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[11px] text-slate-400 dark:text-gray-500">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 16 16"
@@ -171,5 +171,6 @@ function Register() {
     </main>
   );
 }
+
 
 export default Register;

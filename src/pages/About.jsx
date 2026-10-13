@@ -91,8 +91,8 @@ const faqs = [
 
 function About() {
   return (
-    <main className="bg-[#f8f7f5] text-slate-900">
-      <section className="relative isolate overflow-hidden bg-[#8f1732] text-white">
+    <main className="bg-[#f8f7f5] text-slate-900 transition-colors duration-200 dark:bg-gray-950 dark:text-gray-100">
+      <section className="relative isolate overflow-hidden bg-[#8f1732] text-white dark:bg-gradient-to-br dark:from-[#600f22] dark:via-gray-950 dark:to-gray-950">
         <div
           aria-hidden="true"
           className="absolute -right-36 -top-44 -z-10 h-[32rem] w-[32rem] rounded-full border border-white/10"
@@ -246,14 +246,14 @@ function About() {
       <section className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 dark:text-rose-400">
               Why we built it
             </p>
-            <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Make the first connection easier.
             </h2>
           </div>
-          <div className="space-y-5 text-base leading-8 text-slate-600">
+          <div className="space-y-5 text-base leading-8 text-slate-600 dark:text-gray-300">
             <p>
               Finding a compatible blood group is only part of the challenge.
               People also need a practical way to discover willing donors nearby
@@ -265,7 +265,7 @@ function About() {
               experience. The project focuses on the Chattogram division and
               its districts, with local area filters to help narrow a search.
             </p>
-            <p className="rounded-r-xl border-l-2 border-rose-300 bg-white py-3 pl-5 pr-4 text-sm leading-7 text-slate-600">
+            <p className="rounded-r-xl border-l-2 border-rose-300 bg-white py-3 pl-5 pr-4 text-sm leading-7 text-slate-600 shadow-sm dark:border-rose-500 dark:bg-gray-900 dark:text-gray-300">
               Our goal is to support the connection—not to replace hospitals,
               blood banks, emergency services, or medical professionals.
             </p>
@@ -273,16 +273,16 @@ function About() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200/80 bg-white py-16 sm:py-20">
+      <section className="border-y border-slate-200/80 bg-white py-16 transition-colors duration-200 dark:border-gray-800 dark:bg-gray-900/60 sm:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 dark:text-rose-400">
               How it works
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Three steps to a meaningful connection
             </h2>
-            <p className="mt-4 leading-7 text-slate-600">
+            <p className="mt-4 leading-7 text-slate-600 dark:text-gray-400">
               Donors stay in control of their availability. People searching
               can narrow results by blood group and area.
             </p>
@@ -292,10 +292,10 @@ function About() {
             {steps.map((step) => (
               <article
                 key={step.number}
-                className="group rounded-2xl border border-slate-200 bg-[#fcfbfa] p-6 transition duration-200 hover:-translate-y-1 hover:border-rose-200 hover:bg-white hover:shadow-[0_18px_45px_-28px_rgba(143,23,50,0.4)] sm:p-7"
+                className="group rounded-2xl border border-slate-200 bg-[#fcfbfa] p-6 transition duration-200 hover:-translate-y-1 hover:border-rose-200 hover:bg-white hover:shadow-[0_18px_45px_-28px_rgba(143,23,50,0.4)] dark:border-gray-800 dark:bg-gray-900 dark:hover:border-rose-500/50 dark:hover:bg-gray-800/80 sm:p-7"
               >
                 <div className="flex items-center justify-between">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-700 transition group-hover:bg-rose-700 group-hover:text-white">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-700 transition group-hover:bg-rose-700 group-hover:text-white dark:bg-rose-950/60 dark:text-rose-400">
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 24 24"
@@ -305,12 +305,12 @@ function About() {
                       {step.icon}
                     </svg>
                   </span>
-                  <span className="text-sm font-bold tracking-wider text-rose-300">
+                  <span className="text-sm font-bold tracking-wider text-rose-300 dark:text-rose-400">
                     {step.number}
                   </span>
                 </div>
-                <h3 className="mt-6 text-lg font-bold">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <h3 className="mt-6 text-lg font-bold text-slate-900 dark:text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-gray-400">
                   {step.description}
                 </p>
               </article>
@@ -321,19 +321,19 @@ function About() {
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 py-16 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-8">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 dark:text-rose-400">
             Thoughtful by design
           </p>
-          <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-4xl">
             Connection with care.
           </h2>
-          <p className="mt-4 leading-7 text-slate-600">
+          <p className="mt-4 leading-7 text-slate-600 dark:text-gray-400">
             A useful donor directory depends on trust, clear communication, and
             respecting each donor’s choice.
           </p>
           <Link
             to="/register"
-            className="mt-7 inline-flex items-center gap-2 font-semibold text-rose-700 transition hover:gap-3 hover:text-rose-900"
+            className="mt-7 inline-flex items-center gap-2 font-semibold text-rose-700 transition hover:gap-3 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300"
           >
             Join the donor community
             <span aria-hidden="true">→</span>
@@ -341,8 +341,8 @@ function About() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <article className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors dark:border-gray-800 dark:bg-gray-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -364,15 +364,15 @@ function About() {
                 />
               </svg>
             </span>
-            <h3 className="mt-4 font-bold">Donor choice comes first</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="mt-4 font-bold text-slate-900 dark:text-white">Donor choice comes first</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-gray-400">
               Donors can update their profile and choose when to be listed as
               available.
             </p>
           </article>
 
-          <article className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors dark:border-gray-800 dark:bg-gray-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -394,15 +394,15 @@ function About() {
                 />
               </svg>
             </span>
-            <h3 className="mt-4 font-bold">Search with context</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="mt-4 font-bold text-slate-900 dark:text-white">Search with context</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-gray-400">
               Blood group and area filters help people focus on relevant
               available donors.
             </p>
           </article>
 
-          <article className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors dark:border-gray-800 dark:bg-gray-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -423,15 +423,15 @@ function About() {
                 />
               </svg>
             </span>
-            <h3 className="mt-4 font-bold">Direct, respectful contact</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="mt-4 font-bold text-slate-900 dark:text-white">Direct, respectful contact</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-gray-400">
               Registration includes consent for WhatsApp contact when a donor
               profile is available.
             </p>
           </article>
 
-          <article className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700">
+          <article className="rounded-2xl border border-slate-200 bg-white p-5 transition-colors dark:border-gray-800 dark:bg-gray-900">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"
@@ -452,8 +452,8 @@ function About() {
                 />
               </svg>
             </span>
-            <h3 className="mt-4 font-bold">A helpful first step</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="mt-4 font-bold text-slate-900 dark:text-white">A helpful first step</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-gray-400">
               The platform supports discovery and communication; care decisions
               remain with donors and healthcare professionals.
             </p>
@@ -461,31 +461,31 @@ function About() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200/80 bg-white py-16 sm:py-20">
+      <section className="border-y border-slate-200/80 bg-white py-16 transition-colors duration-200 dark:border-gray-800 dark:bg-gray-900/60 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20 lg:px-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-rose-700 dark:text-rose-400">
               Good to know
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               Frequently asked questions
             </h2>
-            <p className="mt-4 leading-7 text-slate-600">
+            <p className="mt-4 leading-7 text-slate-600 dark:text-gray-400">
               A few helpful details about using the donor directory.
             </p>
           </div>
 
-          <div className="divide-y divide-slate-200 border-y border-slate-200">
+          <div className="divide-y divide-slate-200 border-y border-slate-200 dark:divide-gray-800 dark:border-gray-800">
             {faqs.map((faq, index) => (
               <details key={faq.question} className="group py-5">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-slate-900 marker:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-600 [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-slate-900 marker:hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-rose-600 dark:text-white [&::-webkit-details-marker]:hidden">
                   <span className="flex items-start gap-3">
-                    <span className="mt-0.5 text-xs font-bold tracking-wider text-rose-500">
+                    <span className="mt-0.5 text-xs font-bold tracking-wider text-rose-500 dark:text-rose-400">
                       0{index + 1}
                     </span>
                     <span>{faq.question}</span>
                   </span>
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-open:rotate-45 group-open:bg-rose-50 group-open:text-rose-700">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition group-open:rotate-45 group-open:bg-rose-50 group-open:text-rose-700 dark:bg-gray-800 dark:text-gray-300 dark:group-open:bg-rose-950/60 dark:group-open:text-rose-400">
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 20 20"
@@ -501,7 +501,7 @@ function About() {
                     </svg>
                   </span>
                 </summary>
-                <p className="ml-8 mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+                <p className="ml-8 mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-gray-300">
                   {faq.answer}
                 </p>
               </details>

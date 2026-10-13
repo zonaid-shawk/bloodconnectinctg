@@ -3,33 +3,33 @@ import DonorDashboard from "../components/DonorDashboard";
 
 function Home() {
   return (
-    <main>
+    <main className="transition-colors duration-200">
       {/* Hero Section */}
-      <section className="bg-red-200">
+      <section className="bg-red-200 transition-colors duration-200 dark:bg-gradient-to-br dark:from-red-950/50 dark:via-gray-900 dark:to-gray-950">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2">
           <div>
-            <p className="mb-4 font-semibold uppercase tracking-wider text-red-600">
+            <p className="mb-4 font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
               Chittagong based Blood Donor Registration Hub
             </p>
-            <h1 className="text-5xl font-bold leading-tight text-gray-900">
+            <h1 className="text-5xl font-bold leading-tight text-gray-900 dark:text-white">
               Give Blood.
               <br />
-              <span className="text-red-600">Save Lives.</span>
+              <span className="text-red-600 dark:text-red-500">Save Lives.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-gray-600">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-gray-600 dark:text-gray-300">
               Humans are for Humans.{" "}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 to="/find-donor"
-                className="rounded-lg bg-red-600 px-6 py-3 font-semibold text-white hover:bg-red-700"
+                className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-red-700 active:scale-95"
               >
                 Find a Donor
               </Link>
 
               <Link
                 to="/register"
-                className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100"
+                className="rounded-xl border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 shadow-xs transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 Become a Donor
               </Link>
@@ -37,7 +37,7 @@ function Home() {
           </div>
 
           <div className="flex justify-center">
-            <div className="overflow-hidden rounded-full shadow-lg">
+            <div className="overflow-hidden rounded-full shadow-xl ring-4 ring-white/20 dark:ring-white/10">
               <img
                 src="/baby1.jpg"
                 alt="Baby receiving blood support"
@@ -49,15 +49,15 @@ function Home() {
       </section>
 
       {/* Blood Groups */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-20 transition-colors duration-200 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-6 text-center">
-          <p className="font-semibold text-red-600">BLOOD GROUPS</p>
+          <p className="font-semibold text-red-600 dark:text-red-400">BLOOD GROUPS</p>
 
-          <h2 className="mt-2 text-3xl font-bold text-gray-900">
+          <h2 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
             Find the Blood You Need
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-gray-400">
             Search for registered donors according to their blood group and
             location.
           </p>
@@ -67,10 +67,10 @@ function Home() {
               <Link
                 key={group}
                 to={`/find-donor?bloodGroup=${encodeURIComponent(group)}`}
-                className="group rounded-xl border bg-white p-5 text-center shadow-sm transition hover:-translate-y-1 hover:border-red-400 hover:shadow-md"
+                className="group rounded-xl border border-gray-200 bg-white p-5 text-center shadow-xs transition hover:-translate-y-1 hover:border-red-400 hover:shadow-md dark:border-gray-800 dark:bg-gray-800/80 dark:hover:border-red-500"
               >
-                <div className="text-2xl font-bold text-red-600 group-hover:scale-105 transition-transform">{group}</div>
-                <div className="mt-1 text-xs text-gray-500">Find Donors</div>
+                <div className="text-2xl font-bold text-red-600 transition-transform group-hover:scale-105 dark:text-red-500">{group}</div>
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">Find Donors</div>
               </Link>
             ))}
           </div>
@@ -78,23 +78,23 @@ function Home() {
       </section>
 
       {/* Live Donor Analytics Dashboard with Bar Chart */}
-      <section className="border-y border-gray-200 bg-gray-50/70 py-16">
+      <section className="border-y border-gray-200 bg-gray-50/70 py-16 transition-colors duration-200 dark:border-gray-800 dark:bg-gray-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div>
-              <p className="font-semibold uppercase tracking-wider text-red-600 text-xs">
+              <p className="font-semibold uppercase tracking-wider text-red-600 dark:text-red-400 text-xs">
                 LIVE REGISTRY STATS
               </p>
-              <h2 className="mt-1 text-3xl font-black text-gray-900 tracking-tight">
+              <h2 className="mt-1 text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                 Donor Distribution by Blood Type
               </h2>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 Visual breakdown of registered lifesavers across Chittagong ready for emergency transfusion.
               </p>
             </div>
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1 text-sm font-bold text-red-600 hover:text-red-700"
+              className="inline-flex items-center gap-1 text-sm font-bold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
               Open Full Dashboard →
             </Link>
@@ -109,49 +109,49 @@ function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-20 transition-colors duration-200 dark:bg-gray-900">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
-            <p className="font-semibold text-red-600">HOW IT WORKS</p>
+            <p className="font-semibold text-red-600 dark:text-red-400">HOW IT WORKS</p>
 
-            <h2 className="mt-2 text-3xl font-bold text-gray-900">
+            <h2 className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
               Three Simple Steps
             </h2>
           </div>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <div className="rounded-xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
+            <div className="rounded-xl border border-gray-100 bg-white p-8 text-center shadow-xs transition hover:shadow-md dark:border-gray-800 dark:bg-gray-800/70">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-2xl font-bold text-red-600 dark:bg-red-950/70 dark:text-red-400">
                 1
               </div>
 
-              <h3 className="mt-5 text-xl font-bold">Register</h3>
+              <h3 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">Register</h3>
 
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 dark:text-gray-400">
                 Create your account and register as a blood donor.
               </p>
             </div>
 
-            <div className="rounded-xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
+            <div className="rounded-xl border border-gray-100 bg-white p-8 text-center shadow-xs transition hover:shadow-md dark:border-gray-800 dark:bg-gray-800/70">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-2xl font-bold text-red-600 dark:bg-red-950/70 dark:text-red-400">
                 2
               </div>
 
-              <h3 className="mt-5 text-xl font-bold">Find a Donor</h3>
+              <h3 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">Find a Donor</h3>
 
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 dark:text-gray-400">
                 Search for available donors by blood group and location.
               </p>
             </div>
 
-            <div className="rounded-xl bg-white p-8 text-center shadow-sm">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
+            <div className="rounded-xl border border-gray-100 bg-white p-8 text-center shadow-xs transition hover:shadow-md dark:border-gray-800 dark:bg-gray-800/70">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-2xl font-bold text-red-600 dark:bg-red-950/70 dark:text-red-400">
                 3
               </div>
 
-              <h3 className="mt-5 text-xl font-bold">Save a Life</h3>
+              <h3 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">Save a Life</h3>
 
-              <p className="mt-3 text-gray-600">
+              <p className="mt-3 text-gray-600 dark:text-gray-400">
                 Connect with a suitable donor and help someone in need.
               </p>
             </div>
@@ -161,5 +161,6 @@ function Home() {
     </main>
   );
 }
+
 
 export default Home;

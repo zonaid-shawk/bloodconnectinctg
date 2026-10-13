@@ -225,18 +225,18 @@ function Profile() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6">
+    <main className="min-h-screen bg-gray-50 px-4 py-10 transition-colors duration-200 dark:bg-gray-950 sm:px-6">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold text-gray-900">My Donor Profile</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Donor Profile</h1>
 
-        <p className="mt-3 text-gray-600">
+        <p className="mt-3 text-gray-600 dark:text-gray-400">
           Manage your donor information and availability.
         </p>
 
         {message && (
           <p
             role="status"
-            className="mt-5 rounded-lg bg-green-50 p-3 text-green-700"
+            className="mt-5 rounded-lg bg-green-50 p-3 text-green-700 dark:border dark:border-green-900/60 dark:bg-green-950/40 dark:text-green-300"
           >
             {message}
           </p>
@@ -245,21 +245,21 @@ function Profile() {
         {error && (
           <p
             role="alert"
-            className="mt-5 rounded-lg bg-red-50 p-3 text-red-700"
+            className="mt-5 rounded-lg bg-red-50 p-3 text-red-700 dark:border dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
           >
             {error}
           </p>
         )}
 
         {/* Donor Availability */}
-        <section className="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <section className="mt-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Donor Availability
               </h2>
 
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {profile.availability
                   ? "You are visible to people searching for available donors."
                   : "You are not currently listed as an available donor."}
@@ -267,7 +267,7 @@ function Profile() {
 
               <p
                 className={`mt-2 font-semibold ${
-                  profile.availability ? "text-green-700" : "text-gray-500"
+                  profile.availability ? "text-green-700 dark:text-green-400" : "text-gray-500 dark:text-gray-400"
                 }`}
               >
                 Status: {profile.availability ? "Available" : "Unavailable"}
@@ -280,7 +280,7 @@ function Profile() {
               disabled={availabilitySaving}
               className={`rounded-lg px-5 py-3 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 profile.availability
-                  ? "bg-gray-600 hover:bg-gray-700"
+                  ? "bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600"
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
@@ -296,14 +296,14 @@ function Profile() {
         {/* Edit Donor Profile */}
         <form
           onSubmit={handleSubmit}
-          className="mt-8 space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-7"
+          className="mt-8 space-y-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900 sm:p-7"
         >
-          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Edit Profile</h2>
 
           <div>
             <label
               htmlFor="full_name"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
             >
               Full Name
             </label>
@@ -316,14 +316,14 @@ function Profile() {
               onChange={handleChange}
               required
               maxLength={100}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
           </div>
 
           <div>
             <label
               htmlFor="phone"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
             >
               Phone Number
             </label>
@@ -336,23 +336,23 @@ function Profile() {
               onChange={handleChange}
               maxLength={30}
               placeholder="Enter your phone number"
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
             {form.phone && (() => {
               const status = validateBdPhone(form.phone, { required: false });
               if (status.isValid && status.operator) {
                 return (
-                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-700">
-                    <span className="font-semibold rounded-md bg-emerald-50 px-2 py-0.5 ring-1 ring-emerald-600/20">
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400">
+                    <span className="font-semibold rounded-md bg-emerald-50 px-2 py-0.5 ring-1 ring-emerald-600/20 dark:bg-emerald-950/60 dark:text-emerald-300">
                       ✓ {status.operator}
                     </span>
-                    <span className="text-gray-500 font-mono">{status.formatted}</span>
+                    <span className="text-gray-500 dark:text-gray-400 font-mono">{status.formatted}</span>
                   </p>
                 );
               }
               if (form.phone.trim()) {
                 return (
-                  <p className="mt-1.5 text-xs text-amber-600">
+                  <p className="mt-1.5 text-xs text-amber-600 dark:text-amber-400">
                     Standard 11 digits starting with 013-019 (e.g. 01712-345678)
                   </p>
                 );
@@ -364,7 +364,7 @@ function Profile() {
           <div>
             <label
               htmlFor="blood_group"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
             >
               Blood Group
             </label>
@@ -374,7 +374,7 @@ function Profile() {
               name="blood_group"
               value={form.blood_group}
               onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             >
               <option value="">Select blood group</option>
 
@@ -390,7 +390,7 @@ function Profile() {
             <div>
               <label
                 htmlFor="district"
-                className="mb-2 block font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
               >
                 District
               </label>
@@ -401,7 +401,7 @@ function Profile() {
                 value={form.district}
                 onChange={handleDistrictChange}
                 required
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               >
                 <option value="">Select district</option>
 
@@ -416,7 +416,7 @@ function Profile() {
             <div>
               <label
                 htmlFor="upazila"
-                className="mb-2 block font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
               >
                 Upazila / Thana
               </label>
@@ -428,7 +428,7 @@ function Profile() {
                 onChange={handleChange}
                 required
                 disabled={!form.district}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 dark:disabled:bg-gray-800/40 dark:disabled:text-gray-600"
               >
                 <option value="">
                   {form.district
@@ -448,7 +448,7 @@ function Profile() {
           <div>
             <label
               htmlFor="address"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
             >
               Address
             </label>
@@ -461,7 +461,7 @@ function Profile() {
               maxLength={500}
               rows={3}
               placeholder="Enter your address (optional)"
-              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
           </div>
 

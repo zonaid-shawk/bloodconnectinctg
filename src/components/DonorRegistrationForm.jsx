@@ -347,25 +347,25 @@ export default function DonorRegistrationForm({
               Your donor profile is active and discoverable by patients across Chittagong.
             </p>
 
-            <div className="mt-6 w-full max-w-md rounded-2xl border border-gray-100 bg-gray-50/80 p-5 text-left shadow-sm">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3.5">
+            <div className="mt-6 w-full max-w-md rounded-2xl border border-gray-100 bg-gray-50/80 p-5 text-left shadow-sm dark:border-gray-800 dark:bg-gray-900/80">
+              <div className="flex items-center justify-between border-b border-gray-200 pb-3.5 dark:border-gray-800">
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blood Type</p>
-                  <p className="text-2xl font-extrabold text-red-600">{registeredDonor.blood_group}</p>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Blood Type</p>
+                  <p className="text-2xl font-extrabold text-red-600 dark:text-red-500">{registeredDonor.blood_group}</p>
                 </div>
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                   {registeredDonor.availability ? "Available to Donate" : "Inactive"}
                 </span>
               </div>
 
               <div className="mt-3.5 grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-xs text-gray-500">Location</p>
-                  <p className="font-medium text-gray-800 truncate">{registeredDonor.upazila}, {registeredDonor.district}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Location</p>
+                  <p className="font-medium text-gray-800 truncate dark:text-gray-200">{registeredDonor.upazila}, {registeredDonor.district}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Contact</p>
-                  <p className="font-medium font-mono text-gray-800 truncate">{registeredDonor.phone}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Contact</p>
+                  <p className="font-medium font-mono text-gray-800 truncate dark:text-gray-200">{registeredDonor.phone}</p>
                 </div>
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function DonorRegistrationForm({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/70"
               >
                 View Full Confirmation
               </button>
@@ -412,17 +412,17 @@ export default function DonorRegistrationForm({
       <form
         onSubmit={handleSubmit}
         noValidate
-        className={`rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 ${className}`}
+        className={`rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-800 dark:bg-gray-900 md:p-8 ${className}`}
       >
       {!hideHeader && (
-        <div className="border-b border-gray-100 pb-4">
+        <div className="border-b border-gray-100 pb-4 dark:border-gray-800">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400">
               🩸
             </span>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Blood Donor Registration</h2>
-              <p className="text-xs text-gray-500">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Blood Donor Registration</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Join the Chittagong donor network and help save lives in emergencies
               </p>
             </div>
@@ -431,7 +431,7 @@ export default function DonorRegistrationForm({
       )}
 
       {submitError && (
-        <div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300">
           <div className="flex items-center gap-2">
             <svg className="h-5 w-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -444,7 +444,7 @@ export default function DonorRegistrationForm({
       {/* SECTION 1: Personal & Blood Group */}
       <div className="mt-6 space-y-5">
         <div>
-          <label htmlFor={`${formId}-fullName`} className="block text-sm font-semibold text-gray-700">
+          <label htmlFor={`${formId}-fullName`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
             Full Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -456,23 +456,23 @@ export default function DonorRegistrationForm({
             value={formData.fullName}
             onChange={handleChange}
             onBlur={handleBlur}
-            className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+            className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
               errors.fullName && touched.fullName
-                ? "border-red-500 ring-2 ring-red-100"
+                ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                 : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
             }`}
           />
           {errors.fullName && touched.fullName && (
-            <p className="mt-1 text-xs text-red-600">{errors.fullName}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.fullName}</p>
           )}
         </div>
 
         {/* Blood Group Chips */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
             Blood Type <span className="text-red-500">*</span>
           </label>
-          <p className="text-xs text-gray-500">Select your ABO and Rh blood group</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Select your ABO and Rh blood group</p>
           <div className="mt-2.5 grid grid-cols-4 gap-2 sm:grid-cols-8">
             {BLOOD_GROUPS.map((group) => {
               const isSelected = formData.bloodGroup === group;
@@ -487,7 +487,7 @@ export default function DonorRegistrationForm({
                   className={`flex h-12 flex-col items-center justify-center rounded-xl border font-bold transition ${
                     isSelected
                       ? "border-red-600 bg-red-600 text-white shadow-sm"
-                      : "border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300 hover:bg-red-50/50"
+                      : "border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300 hover:bg-red-50/50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-red-500 dark:hover:bg-red-950/40"
                   }`}
                 >
                   <span className="text-base">{group}</span>
@@ -496,14 +496,14 @@ export default function DonorRegistrationForm({
             })}
           </div>
           {errors.bloodGroup && touched.bloodGroup && (
-            <p className="mt-1 text-xs text-red-600">{errors.bloodGroup}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.bloodGroup}</p>
           )}
         </div>
 
         {/* Gender & DOB */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor={`${formId}-gender`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-gender`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Gender
             </label>
             <select
@@ -511,7 +511,7 @@ export default function DonorRegistrationForm({
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             >
               {GENDER_OPTIONS.map((g) => (
                 <option key={g} value={g}>
@@ -522,8 +522,8 @@ export default function DonorRegistrationForm({
           </div>
 
           <div>
-            <label htmlFor={`${formId}-dateOfBirth`} className="block text-sm font-semibold text-gray-700">
-              Date of Birth <span className="text-xs font-normal text-gray-500">(18+ required)</span>
+            <label htmlFor={`${formId}-dateOfBirth`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Date of Birth <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(18+ required)</span>
             </label>
             <input
               id={`${formId}-dateOfBirth`}
@@ -533,31 +533,31 @@ export default function DonorRegistrationForm({
               value={formData.dateOfBirth}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                 errors.dateOfBirth && touched.dateOfBirth
-                  ? "border-red-500 ring-2 ring-red-100"
+                  ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                   : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
               }`}
             />
             {errors.dateOfBirth && touched.dateOfBirth && (
-              <p className="mt-1 text-xs text-red-600">{errors.dateOfBirth}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.dateOfBirth}</p>
             )}
           </div>
         </div>
       </div>
 
       {/* SECTION 2: Location in Chittagong */}
-      <div className="mt-7 border-t border-gray-100 pt-5">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700">
+      <div className="mt-7 border-t border-gray-100 pt-5 dark:border-gray-800">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
           Chittagong Location
         </h3>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Specify your location within the Chittagong division for nearby matching
         </p>
 
         <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor={`${formId}-district`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-district`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               District / Area <span className="text-red-500">*</span>
             </label>
             <select
@@ -567,9 +567,9 @@ export default function DonorRegistrationForm({
               value={formData.district}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`mt-1.5 w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+              className={`mt-1.5 w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                 errors.district && touched.district
-                  ? "border-red-500 ring-2 ring-red-100"
+                  ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                   : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
               }`}
             >
@@ -580,12 +580,12 @@ export default function DonorRegistrationForm({
               ))}
             </select>
             {errors.district && touched.district && (
-              <p className="mt-1 text-xs text-red-600">{errors.district}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.district}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor={`${formId}-upazila`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-upazila`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Upazila / Thana <span className="text-red-500">*</span>
             </label>
             <select
@@ -595,9 +595,9 @@ export default function DonorRegistrationForm({
               value={formData.upazila}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`mt-1.5 w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+              className={`mt-1.5 w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                 errors.upazila && touched.upazila
-                  ? "border-red-500 ring-2 ring-red-100"
+                  ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                   : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
               }`}
             >
@@ -608,14 +608,14 @@ export default function DonorRegistrationForm({
               ))}
             </select>
             {errors.upazila && touched.upazila && (
-              <p className="mt-1 text-xs text-red-600">{errors.upazila}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.upazila}</p>
             )}
           </div>
         </div>
 
         <div className="mt-4">
-          <label htmlFor={`${formId}-address`} className="block text-sm font-semibold text-gray-700">
-            Address / Landmark <span className="text-xs font-normal text-gray-500">(Optional)</span>
+          <label htmlFor={`${formId}-address`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            Address / Landmark <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(Optional)</span>
           </label>
           <input
             id={`${formId}-address`}
@@ -624,27 +624,27 @@ export default function DonorRegistrationForm({
             placeholder="e.g. Near GEC Circle, O.R. Nizam Road, or Chittagong Medical College"
             value={formData.address}
             onChange={handleChange}
-            className="mt-1.5 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+            className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
           />
         </div>
       </div>
 
       {/* SECTION 3: Contact Information */}
-      <div className="mt-7 border-t border-gray-100 pt-5">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700">
+      <div className="mt-7 border-t border-gray-100 pt-5 dark:border-gray-800">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
           Contact Information
         </h3>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Recipients and hospital volunteers will reach out via these details
         </p>
 
         <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor={`${formId}-phone`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-phone`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Mobile Number <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-1.5">
-              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-medium text-gray-400">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-medium text-gray-400 dark:text-gray-500">
                 BD (+88)
               </span>
               <input
@@ -656,15 +656,15 @@ export default function DonorRegistrationForm({
                 value={formData.phone}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className={`w-full rounded-xl border pl-19 pr-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+                className={`w-full rounded-xl border pl-19 pr-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                   errors.phone && touched.phone
-                    ? "border-red-500 ring-2 ring-red-100"
+                    ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                     : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                 }`}
               />
             </div>
             {errors.phone && touched.phone ? (
-              <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
+              <p className="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
                 <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -676,20 +676,20 @@ export default function DonorRegistrationForm({
                 if (phoneStatus.isValid && phoneStatus.operator) {
                   return (
                     <div className="mt-1.5 flex items-center gap-2 text-xs">
-                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700 ring-1 ring-emerald-600/20">
-                        <svg className="h-3 w-3 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-950/60 dark:text-emerald-300">
+                        <svg className="h-3 w-3 text-emerald-600 dark:text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {phoneStatus.operator}
                       </span>
-                      <span className="text-gray-500 font-mono">
+                      <span className="text-gray-500 font-mono dark:text-gray-400">
                         Standard: {phoneStatus.formatted}
                       </span>
                     </div>
                   );
                 }
                 return (
-                  <p className="mt-1 text-[11px] text-gray-500">
+                  <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
                     Standard 11 digits starting with 013-019 (e.g. 01712-345678)
                   </p>
                 );
@@ -698,7 +698,7 @@ export default function DonorRegistrationForm({
           </div>
 
           <div>
-            <label htmlFor={`${formId}-email`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-email`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Email Address <span className="text-red-500">*</span>
             </label>
             <input
@@ -710,34 +710,34 @@ export default function DonorRegistrationForm({
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                 errors.email && touched.email
-                  ? "border-red-500 ring-2 ring-red-100"
+                  ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                   : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
               }`}
             />
             {errors.email && touched.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.email}</p>
             )}
           </div>
         </div>
 
         {/* WhatsApp Checkbox & Field */}
-        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/70 p-3.5">
-          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-gray-700">
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/70 p-3.5 dark:border-gray-800 dark:bg-gray-800/50">
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-gray-700 dark:text-gray-300">
             <input
               type="checkbox"
               name="sameAsPhone"
               checked={formData.sameAsPhone}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+              className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-700 dark:bg-gray-800"
             />
             <span>WhatsApp number is the same as mobile number</span>
           </label>
 
           {!formData.sameAsPhone && (
             <div className="mt-3">
-              <label htmlFor={`${formId}-whatsapp`} className="block text-xs font-semibold text-gray-600">
+              <label htmlFor={`${formId}-whatsapp`} className="block text-xs font-semibold text-gray-600 dark:text-gray-300">
                 Dedicated WhatsApp Number
               </label>
               <input
@@ -748,10 +748,10 @@ export default function DonorRegistrationForm({
                 value={formData.whatsapp}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-500"
+                className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               />
               {errors.whatsapp && touched.whatsapp ? (
-                <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
                   <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -762,13 +762,13 @@ export default function DonorRegistrationForm({
                   const waStatus = validateBdPhone(formData.whatsapp, { required: false });
                   if (waStatus.isValid && waStatus.operator) {
                     return (
-                      <p className="mt-1 text-xs text-emerald-700">
+                      <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
                         ✓ {waStatus.operator} ({waStatus.formatted})
                       </p>
                     );
                   }
                   return (
-                    <p className="mt-1 text-[11px] text-gray-500">
+                    <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
                       e.g. 01812345678 (11 digits with Bangladesh operator code)
                     </p>
                   );
@@ -780,15 +780,15 @@ export default function DonorRegistrationForm({
       </div>
 
       {/* SECTION 4: Last Donation & Availability */}
-      <div className="mt-7 border-t border-gray-100 pt-5">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700">
+      <div className="mt-7 border-t border-gray-100 pt-5 dark:border-gray-800">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
           Donation Status
         </h3>
 
         <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor={`${formId}-lastDonationDate`} className="block text-sm font-semibold text-gray-700">
-              Last Donation Date <span className="text-xs font-normal text-gray-500">(Optional)</span>
+            <label htmlFor={`${formId}-lastDonationDate`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Last Donation Date <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(Optional)</span>
             </label>
             <input
               id={`${formId}-lastDonationDate`}
@@ -797,12 +797,12 @@ export default function DonorRegistrationForm({
               max={todayStr}
               value={formData.lastDonationDate}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100"
+              className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
             {formData.lastDonationDate && (
               <p
                 className={`mt-1.5 text-xs font-medium ${
-                  eligibility.isEligible ? "text-emerald-600" : "text-amber-600"
+                  eligibility.isEligible ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
                 }`}
               >
                 {eligibility.message}
@@ -811,7 +811,7 @@ export default function DonorRegistrationForm({
           </div>
 
           <div className="flex flex-col justify-center">
-            <span className="block text-sm font-semibold text-gray-700">
+            <span className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Immediate Availability
             </span>
             <label className="mt-2 flex cursor-pointer items-center gap-3">
@@ -820,10 +820,10 @@ export default function DonorRegistrationForm({
                 name="isAvailable"
                 checked={formData.isAvailable}
                 onChange={handleChange}
-                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-700 dark:bg-gray-800"
               />
-              <span className="text-sm text-gray-700">
-                Mark me as <strong className="text-green-700">Available</strong> in the Chittagong donor directory
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Mark me as <strong className="text-green-700 dark:text-green-400">Available</strong> in the Chittagong donor directory
               </span>
             </label>
           </div>
@@ -832,7 +832,7 @@ export default function DonorRegistrationForm({
         {/* Password if enabled */}
         {showPassword && (
           <div className="mt-4">
-            <label htmlFor={`${formId}-password`} className="block text-sm font-semibold text-gray-700">
+            <label htmlFor={`${formId}-password`} className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Create Password <span className="text-red-500">*</span>
             </label>
             <input
@@ -845,27 +845,27 @@ export default function DonorRegistrationForm({
               value={formData.password}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition ${
+              className={`mt-1.5 w-full rounded-xl border px-4 py-2.5 text-sm text-gray-900 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950 ${
                 errors.password && touched.password
-                  ? "border-red-500 ring-2 ring-red-100"
+                  ? "border-red-500 ring-2 ring-red-100 dark:ring-red-950"
                   : "border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-100"
               }`}
             />
             {errors.password && touched.password && (
-              <p className="mt-1 text-xs text-red-600">{errors.password}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.password}</p>
             )}
           </div>
         )}
 
         {/* Consent Checkbox */}
         <div className="mt-5">
-          <label className="flex cursor-pointer items-start gap-2.5 text-xs text-gray-600">
+          <label className="flex cursor-pointer items-start gap-2.5 text-xs text-gray-600 dark:text-gray-400">
             <input
               type="checkbox"
               name="consent"
               checked={formData.consent}
               onChange={handleChange}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500 shrink-0"
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500 shrink-0 dark:border-gray-700 dark:bg-gray-800"
             />
             <span>
               I agree that my contact information may be shared with emergency patients,
@@ -873,12 +873,12 @@ export default function DonorRegistrationForm({
             </span>
           </label>
           {errors.consent && touched.consent && (
-            <p className="mt-1 text-xs text-red-600">{errors.consent}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.consent}</p>
           )}
         </div>
       </div>
 
-      <div className="mt-7 flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+      <div className="mt-7 flex items-center justify-end gap-3 border-t border-gray-100 pt-5 dark:border-gray-800">
         <button
           type="button"
           onClick={() => {
@@ -903,7 +903,7 @@ export default function DonorRegistrationForm({
             setErrors({});
             setSubmitError("");
           }}
-          className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50"
+          className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
         >
           Reset
         </button>

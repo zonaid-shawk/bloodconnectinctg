@@ -38,12 +38,12 @@ function Login() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-16">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-sm">
+    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-16 transition-colors duration-200 dark:bg-gray-950">
+      <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
 
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Login to your BloodConnect account.
           </p>
         </div>
@@ -52,7 +52,7 @@ function Login() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300 text-sm"
             >
               Email
             </label>
@@ -65,14 +65,14 @@ function Login() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block font-medium text-gray-700"
+              className="mb-2 block font-medium text-gray-700 dark:text-gray-300 text-sm"
             >
               Password
             </label>
@@ -85,14 +85,14 @@ function Login() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-red-500"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
           </div>
 
           {error && (
             <p
               role="alert"
-              className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
+              className="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300 dark:border dark:border-red-900/50"
             >
               {error}
             </p>
@@ -101,17 +101,17 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-red-600 py-3 font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-xl bg-red-600 py-3 font-semibold text-white shadow-xs transition hover:bg-red-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="font-semibold text-red-600 hover:text-red-700"
+            className="font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
           >
             Register
           </Link>
@@ -120,5 +120,6 @@ function Login() {
     </main>
   );
 }
+
 
 export default Login;

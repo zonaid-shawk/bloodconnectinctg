@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
@@ -14,11 +15,12 @@ import Profile from "./pages/Profile";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="flex min-h-screen flex-col">
-        <Navbar />
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="flex min-h-screen flex-col bg-white text-gray-900 transition-colors duration-200 dark:bg-gray-950 dark:text-gray-100">
+          <Navbar />
 
-        <div className="flex-1">
+          <div className="flex-1">
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
@@ -38,6 +40,7 @@ function App() {
         <Footer />
       </div>
     </BrowserRouter>
+  </ThemeProvider>
   );
 }
 

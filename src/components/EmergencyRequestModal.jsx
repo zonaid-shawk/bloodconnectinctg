@@ -176,24 +176,24 @@ export default function EmergencyRequestModal({
         aria-hidden="true"
       />
 
-      <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200 dark:border dark:border-gray-800 dark:bg-gray-900 dark:ring-white/10">
         {/* Urgent header bar */}
         <div className="h-3 w-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-500 animate-pulse" />
 
         {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4.5">
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4.5 dark:border-gray-800">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-100 text-red-600 text-xl shadow-inner">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-red-100 text-red-600 text-xl shadow-inner dark:bg-red-950/60 dark:text-red-400">
               🚨
             </span>
             <div>
               <h2
                 id={`${formId}-title`}
-                className="text-lg font-extrabold text-gray-900"
+                className="text-lg font-extrabold text-gray-900 dark:text-white"
               >
                 Post Emergency Blood Request
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Flag your urgent blood need to donors across Chittagong
               </p>
             </div>
@@ -203,7 +203,7 @@ export default function EmergencyRequestModal({
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
           >
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -218,31 +218,31 @@ export default function EmergencyRequestModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto p-6 space-y-4.5">
           {submitError && (
-            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-700">
+            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/50 dark:text-red-300">
               {submitError}
             </div>
           )}
 
           {/* URGENT TOGGLE CALLOUT */}
-          <div className="rounded-2xl border-2 border-red-200 bg-red-50/70 p-4 transition">
+          <div className="rounded-2xl border-2 border-red-200 bg-red-50/70 p-4 transition dark:border-red-900/60 dark:bg-red-950/40">
             <label className="flex cursor-pointer items-start gap-3">
               <input
                 type="checkbox"
                 name="urgent"
                 checked={formData.urgent}
                 onChange={handleChange}
-                className="mt-0.5 h-5 w-5 rounded border-red-300 text-red-600 focus:ring-red-500"
+                className="mt-0.5 h-5 w-5 rounded border-red-300 text-red-600 focus:ring-red-500 dark:border-red-800 dark:bg-gray-800"
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-sm text-red-800">
+                  <span className="font-extrabold text-sm text-red-800 dark:text-red-300">
                     Flag as 'Urgent' Emergency
                   </span>
                   <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
                     Top Priority
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-red-700 leading-relaxed">
+                <p className="mt-1 text-xs text-red-700 dark:text-red-300/80 leading-relaxed">
                   Urgent requests are pinned at the top of Chittagong search results with high-priority emergency alerts.
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default function EmergencyRequestModal({
 
           {/* Blood Group Chips */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+            <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
               Blood Group Needed <span className="text-red-500">*</span>
             </label>
             <div className="mt-2 grid grid-cols-4 gap-2 sm:grid-cols-8">
@@ -268,7 +268,7 @@ export default function EmergencyRequestModal({
                     className={`flex h-11 flex-col items-center justify-center rounded-xl border font-black transition ${
                       isSelected
                         ? "border-red-600 bg-red-600 text-white shadow-sm ring-2 ring-red-600/20"
-                        : "border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300 hover:bg-red-50/50"
+                        : "border-gray-200 bg-gray-50 text-gray-700 hover:border-red-300 hover:bg-red-50/50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-red-500 dark:hover:bg-red-950/40"
                     }`}
                   >
                     <span>{group}</span>
@@ -280,7 +280,7 @@ export default function EmergencyRequestModal({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={`${formId}-patientName`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+              <label htmlFor={`${formId}-patientName`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 Patient / Attendant Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -291,15 +291,15 @@ export default function EmergencyRequestModal({
                 placeholder="e.g. Fatima Begum"
                 value={formData.patientName}
                 onChange={handleChange}
-                className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               />
               {errors.patientName && (
-                <p className="mt-1 text-xs text-red-600">{errors.patientName}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.patientName}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor={`${formId}-bagsNeeded`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+              <label htmlFor={`${formId}-bagsNeeded`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 Units / Bags Needed
               </label>
               <select
@@ -307,7 +307,7 @@ export default function EmergencyRequestModal({
                 name="bagsNeeded"
                 value={formData.bagsNeeded}
                 onChange={handleChange}
-                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               >
                 {[1, 2, 3, 4, 5, 6].map((num) => (
                   <option key={num} value={num}>
@@ -320,7 +320,7 @@ export default function EmergencyRequestModal({
 
           {/* Hospital Name & Suggestions */}
           <div>
-            <label htmlFor={`${formId}-hospital`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+            <label htmlFor={`${formId}-hospital`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
               Hospital / Medical Facility <span className="text-red-500">*</span>
             </label>
             <input
@@ -331,21 +331,21 @@ export default function EmergencyRequestModal({
               placeholder="e.g. Chittagong Medical College Hospital (CMCH)"
               value={formData.hospital}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
             {errors.hospital && (
-              <p className="mt-1 text-xs text-red-600">{errors.hospital}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.hospital}</p>
             )}
 
             {/* Quick hospital chips */}
             <div className="mt-2 flex flex-wrap gap-1.5">
-              <span className="text-[11px] text-gray-400 self-center">Quick pick:</span>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500 self-center">Quick pick:</span>
               {COMMON_CHITTAGONG_HOSPITALS.slice(0, 4).map((h) => (
                 <button
                   key={h}
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, hospital: h }))}
-                  className="rounded-lg bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700 hover:bg-red-50 hover:text-red-700 transition"
+                  className="rounded-lg bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700 hover:bg-red-50 hover:text-red-700 transition dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-950/60 dark:hover:text-red-300"
                 >
                   {h.split(",")[0].replace(" Hospital", "")}
                 </button>
@@ -356,7 +356,7 @@ export default function EmergencyRequestModal({
           {/* Location Dropdowns */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor={`${formId}-district`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+              <label htmlFor={`${formId}-district`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 Chittagong District <span className="text-red-500">*</span>
               </label>
               <select
@@ -364,7 +364,7 @@ export default function EmergencyRequestModal({
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
-                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               >
                 {districts.map((d) => (
                   <option key={d} value={d}>
@@ -375,7 +375,7 @@ export default function EmergencyRequestModal({
             </div>
 
             <div>
-              <label htmlFor={`${formId}-upazila`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+              <label htmlFor={`${formId}-upazila`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 Upazila / Thana <span className="text-red-500">*</span>
               </label>
               <select
@@ -383,7 +383,7 @@ export default function EmergencyRequestModal({
                 name="upazila"
                 value={formData.upazila}
                 onChange={handleChange}
-                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               >
                 {(locations[formData.district] || []).map((u) => (
                   <option key={u} value={u}>
@@ -396,11 +396,11 @@ export default function EmergencyRequestModal({
 
           {/* Contact Mobile */}
           <div>
-            <label htmlFor={`${formId}-phone`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+            <label htmlFor={`${formId}-phone`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
               Emergency Contact Mobile <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-1.5">
-              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-medium text-gray-400">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-medium text-gray-400 dark:text-gray-500">
                 BD (+88)
               </span>
               <input
@@ -411,13 +411,13 @@ export default function EmergencyRequestModal({
                 placeholder="01812345678"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full rounded-xl border border-gray-300 pl-19 pr-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+                className="w-full rounded-xl border border-gray-300 pl-19 pr-4 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
               />
             </div>
             {errors.phone ? (
-              <p className="mt-1 text-xs text-red-600">{errors.phone}</p>
+              <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.phone}</p>
             ) : (
-              <p className="mt-1 text-[11px] text-gray-500">
+              <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
                 Donors will call or WhatsApp this number directly.
               </p>
             )}
@@ -425,8 +425,8 @@ export default function EmergencyRequestModal({
 
           {/* Reason / Urgency Context */}
           <div>
-            <label htmlFor={`${formId}-reason`} className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-              Urgency Reason / Ward <span className="text-xs font-normal text-gray-400">(Optional)</span>
+            <label htmlFor={`${formId}-reason`} className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+              Urgency Reason / Ward <span className="text-xs font-normal text-gray-400 dark:text-gray-500">(Optional)</span>
             </label>
             <input
               id={`${formId}-reason`}
@@ -435,16 +435,16 @@ export default function EmergencyRequestModal({
               placeholder="e.g. Surgery at 3:00 PM, ICU Ward 12, Thalassemia emergency"
               value={formData.reason}
               onChange={handleChange}
-              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
+              className="mt-1.5 w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-red-950"
             />
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 dark:border-gray-800">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               Cancel
             </button>
@@ -452,7 +452,7 @@ export default function EmergencyRequestModal({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 active:scale-95 disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -469,6 +469,7 @@ export default function EmergencyRequestModal({
           </div>
         </form>
       </div>
+
     </div>
   );
 }
