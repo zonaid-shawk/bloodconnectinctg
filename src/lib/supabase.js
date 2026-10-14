@@ -1,10 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 
 // Clean and normalize Supabase configuration
-const rawUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
+const rawUrl = (
+  import.meta.env.VITE_SUPABASE_URL ||
+  "https://qucvfyhalpgnukcfzbrr.supabase.co"
+)?.trim();
+
 const rawKey = (
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  "sb_publishable_TfjMfffIsTnxAev0fh57Fg_jgPuowak"
 )?.trim();
 
 const isConfigured = Boolean(
@@ -115,7 +120,7 @@ alter table public.donors enable row level security;
 alter table public.donation_history enable row level security;
 alter table public.emergency_requests enable row level security;
 
--- Policies for donors (read & register open to all; updates allowed)
+-- Policies for donors (read, insert, update, delete open to all)
 drop policy if exists "Allow public read of donors" on public.donors;
 create policy "Allow public read of donors" on public.donors
   for select using (true);
@@ -128,6 +133,10 @@ drop policy if exists "Allow update donors" on public.donors;
 create policy "Allow update donors" on public.donors
   for update using (true);
 
+drop policy if exists "Allow delete donors" on public.donors;
+create policy "Allow delete donors" on public.donors
+  for delete using (true);
+
 -- Policies for donation_history
 drop policy if exists "Allow public read of donation_history" on public.donation_history;
 create policy "Allow public read of donation_history" on public.donation_history
@@ -136,6 +145,14 @@ create policy "Allow public read of donation_history" on public.donation_history
 drop policy if exists "Allow public insert of donation_history" on public.donation_history;
 create policy "Allow public insert of donation_history" on public.donation_history
   for insert with check (true);
+
+drop policy if exists "Allow update of donation_history" on public.donation_history;
+create policy "Allow update of donation_history" on public.donation_history
+  for update using (true);
+
+drop policy if exists "Allow delete of donation_history" on public.donation_history;
+create policy "Allow delete of donation_history" on public.donation_history
+  for delete using (true);
 
 -- Policies for emergency_requests
 drop policy if exists "Allow public read of emergency_requests" on public.emergency_requests;
@@ -149,6 +166,27 @@ create policy "Allow public insert of emergency_requests" on public.emergency_re
 drop policy if exists "Allow update of emergency_requests" on public.emergency_requests;
 create policy "Allow update of emergency_requests" on public.emergency_requests
   for update using (true);
+
+drop policy if exists "Allow delete of emergency_requests" on public.emergency_requests;
+create policy "Allow delete of emergency_requests" on public.emergency_requests
+  for delete using (true);
+
+-- 9. Optional: Seed initial verified Chittagong donors (safe to run multiple times)
+insert into public.donors (id, full_name, phone, whatsapp_number, blood_group, gender, district, upazila, address, availability, last_donation_date, total_donations, notes)
+values
+  ('a1111111-1111-1111-1111-111111111111', 'Tanvir Hasan', '01711223344', '01711223344', 'A+', 'Male', 'Chattogram', 'Kotwali', 'Anderkilla, Kotwali, Chattogram', true, '2024-05-18', 4, 'Regular blood donor since 2020. Available for emergency hospital calls.'),
+  ('a2222222-2222-2222-2222-222222222222', 'Nusrat Jahan', '01819876543', '01819876543', 'O+', 'Female', 'Chattogram', 'Panchlaish', 'Nasirabad Housing Society, Panchlaish', true, '2024-03-10', 3, 'CMCH volunteer. Prefer WhatsApp messaging before calls during work hours.'),
+  ('a3333333-3333-3333-3333-333333333333', 'Rafiqul Islam', '01912345678', '01912345678', 'B+', 'Male', 'Chattogram', 'Halishahar', 'Block H, Halishahar Housing Estate', true, '2024-06-02', 6, 'Platelet and whole blood donor. Always ready for pediatric emergencies.'),
+  ('a4444444-4444-4444-4444-444444444444', 'Ayesha Siddiqua', '01611223344', '01611223344', 'AB+', 'Female', 'Cox''s Bazar', 'Cox''s Bazar Sadar', 'Laldighir Par, Cox''s Bazar', true, '2024-01-20', 2, 'University student and community youth wing volunteer.'),
+  ('a5555555-5555-5555-5555-555555555555', 'Mahmudur Rahman', '01755667788', '01755667788', 'O-', 'Male', 'Cumilla', 'Cumilla Adarsha Sadar', 'Kandirpar, Cumilla', true, '2024-04-05', 5, 'Universal negative donor. Registered on Red Crescent rapid responder roster.')
+on conflict (id) do nothing;
+
+-- 10. Optional: Seed initial active emergency requests
+insert into public.emergency_requests (id, patient_name, blood_group, bags_needed, hospital, district, upazila, phone, urgent, reason, status)
+values
+  ('b1111111-1111-1111-1111-111111111111', 'Fatima Begum', 'O+', 2, 'Chittagong Medical College Hospital (CMCH)', 'Chattogram', 'Panchlaish', '01819876543', true, 'Emergency cardiac surgery, Ward 26', 'active'),
+  ('b2222222-2222-2222-2222-222222222222', 'Abdul Karim', 'A-', 1, 'Parkview Hospital, Chittagong', 'Chattogram', 'Panchlaish', '01711223344', true, 'Severe anemia / Thalassemia crisis', 'active')
+on conflict (id) do nothing;
 `;
 
 // Initial rich mock donor dataset (realistic Chittagong donors)
