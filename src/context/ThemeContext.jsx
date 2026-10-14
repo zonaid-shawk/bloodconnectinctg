@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useEffect, useState, useMemo, useCallback } from "react";
 export { useTheme } from "./useTheme";
 
@@ -82,7 +83,7 @@ export function ThemeProvider({ children, defaultTheme = "system" }) {
 
   const toggleTheme = useCallback(() => {
     setThemeState((prevTheme) => {
-      let currentIsDark = false;
+      let currentIsDark;
       if (prevTheme === "system") {
         currentIsDark = typeof window !== "undefined" && window.matchMedia
           ? window.matchMedia("(prefers-color-scheme: dark)").matches

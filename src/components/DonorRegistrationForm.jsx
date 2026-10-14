@@ -253,18 +253,57 @@ export default function DonorRegistrationForm({
       if (onSubmit) {
         await onSubmit(donorPayload);
       } else {
-        // Register using Supabase client
-        const passwordToUse = showPassword ? formData.password : "DonorPass123!";
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: donorPayload.email,
-          password: passwordToUse,
-          options: {
-            data: donorPayload,
-          },
-        });
+        // Direct database save with optional account login
+        let authUserId = null;
+        if (showPassword && formData.password) {
+          try {
+            const { data: authData, error: signUpError } = await supabase.auth.signUp({
+              email: donorPayload.email,
+              password: formData.password,
+              options: {
+                data: donorPayload,
+              },
+            });
+            if (!signUpError && authData?.user?.id) {
+              authUserId = authData.user.id;
+            }
+          } catch (authErr) {
+            console.warn("Optional Supabase auth note:", authErr.message);
+          }
+        }
 
-        if (signUpError) {
-          throw signUpError;
+        // Direct database save into public.donors table
+        const donorRecordToInsert = {
+          ...donorPayload,
+          auth_user_id: authUserId,
+          total_donations: donorPayload.last_donation_date ? 1 : 0,
+        };
+
+        const { data: savedDonor, error: dbError } = await supabase
+          .from("donors")
+          .insert([donorRecordToInsert])
+          .select()
+          .single();
+
+        if (dbError) {
+          console.error("Supabase donors insert error:", dbError);
+          throw new Error(dbError.message || "Failed to save donor record into Supabase database.");
+        }
+
+        // Dedicated donation_history record if previous donation date was specified
+        if (donorPayload.last_donation_date) {
+          try {
+            await supabase.from("donation_history").insert({
+              donor_id: savedDonor?.id || donorRecordToInsert.id,
+              donation_date: donorPayload.last_donation_date,
+              hospital: "Self-reported prior donation",
+              units_donated: 1,
+              notes: "Recorded during donor registration",
+              verified: true,
+            });
+          } catch (histErr) {
+            console.warn("Could not log initial donation history record:", histErr);
+          }
         }
       }
 

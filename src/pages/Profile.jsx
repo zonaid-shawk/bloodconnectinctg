@@ -22,6 +22,14 @@ function Profile() {
   const [availabilitySaving, setAvailabilitySaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [donationHistory, setDonationHistory] = useState([]);
+  const [showLogDonation, setShowLogDonation] = useState(false);
+  const [logHospital, setLogHospital] = useState("");
+  const [logDate, setLogDate] = useState(new Date().toISOString().split("T")[0]);
+  const [logPatient, setLogPatient] = useState("");
+  const [logUnits, setLogUnits] = useState(1);
+  const [logNotes, setLogNotes] = useState("");
+  const [logSaving, setLogSaving] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -36,19 +44,51 @@ function Profile() {
           return;
         }
 
-        const { data, error: profileError } = await supabase
-          .from("profiles")
+        let donorData = null;
+        let profileError = null;
+
+        // Try querying donors table first
+        const donorsRes = await supabase
+          .from("donors")
           .select("*")
           .eq("id", user.id)
           .single();
 
-        if (profileError) {
+        if (!donorsRes.error && donorsRes.data) {
+          donorData = donorsRes.data;
+        } else {
+          // Fallback to profiles table
+          const profRes = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+          donorData = profRes.data;
+          profileError = profRes.error;
+        }
+
+        if (profileError && !donorData) {
           setError(profileError.message);
           return;
         }
 
-        setProfile(data);
+        setProfile(donorData);
 
+        // Fetch user donation history
+        if (donorData?.id) {
+          try {
+            const { data: hist } = await supabase
+              .from("donation_history")
+              .select("*")
+              .eq("donor_id", donorData.id)
+              .order("donation_date", { ascending: false });
+            setDonationHistory(hist || []);
+          } catch (histErr) {
+            console.warn("Could not load history for profile:", histErr);
+          }
+        }
+
+        const data = donorData || {};
         const savedDistrict = districts.includes(data.district)
           ? data.district
           : "";
@@ -118,8 +158,8 @@ function Profile() {
 
       const newAvailability = !profile.availability;
 
-      const { data, error: updateError } = await supabase
-        .from("profiles")
+      let updateRes = await supabase
+        .from("donors")
         .update({
           availability: newAvailability,
           updated_at: new Date().toISOString(),
@@ -128,18 +168,32 @@ function Profile() {
         .select("availability")
         .single();
 
-      if (updateError) {
-        setError(updateError.message);
+      if (updateRes.error) {
+        updateRes = await supabase
+          .from("profiles")
+          .update({
+            availability: newAvailability,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id)
+          .select("availability")
+          .single();
+      }
+
+      if (updateRes.error) {
+        setError(updateRes.error.message);
         return;
       }
 
+      const updatedAvailability = updateRes.data?.availability ?? newAvailability;
+
       setProfile((previous) => ({
         ...previous,
-        availability: data.availability,
+        availability: updatedAvailability,
       }));
 
       setMessage(
-        data.availability
+        updatedAvailability
           ? "You are now available as a donor!"
           : "You are now unavailable as a donor.",
       );
@@ -183,32 +237,111 @@ function Profile() {
         return;
       }
 
-      const { data, error: updateError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: form.full_name.trim(),
-          phone: normalizedPhone,
-          blood_group: form.blood_group || null,
-          district: form.district,
-          upazila: form.upazila,
-          address: form.address.trim() || null,
-          updated_at: new Date().toISOString(),
-        })
+      const payload = {
+        full_name: form.full_name.trim(),
+        phone: normalizedPhone,
+        blood_group: form.blood_group || null,
+        district: form.district,
+        upazila: form.upazila,
+        address: form.address.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
+
+      let saveRes = await supabase
+        .from("donors")
+        .update(payload)
         .eq("id", user.id)
         .select()
         .single();
 
-      if (updateError) {
-        setError(updateError.message);
+      if (saveRes.error) {
+        saveRes = await supabase
+          .from("profiles")
+          .update(payload)
+          .eq("id", user.id)
+          .select()
+          .single();
+      }
+
+      if (saveRes.error) {
+        setError(saveRes.error.message);
         return;
       }
 
-      setProfile(data);
+      setProfile((prev) => ({ ...prev, ...(saveRes.data || payload) }));
       setMessage("Profile updated successfully!");
     } catch {
       setError("Something went wrong while saving your profile.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleLogDonation(e) {
+    e.preventDefault();
+    if (!logHospital.trim()) {
+      setError("Please specify hospital or blood bank name.");
+      return;
+    }
+
+    setLogSaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const record = {
+        donor_id: profile.id,
+        donation_date: logDate,
+        hospital: logHospital.trim(),
+        patient_name: logPatient.trim() || null,
+        units_donated: Number(logUnits) || 1,
+        notes: logNotes.trim() || null,
+        verified: true,
+      };
+
+      const { data: inserted, error: insErr } = await supabase
+        .from("donation_history")
+        .insert(record)
+        .select()
+        .single();
+
+      if (insErr) throw insErr;
+
+      const updatedHistory = [inserted || record, ...donationHistory];
+      setDonationHistory(updatedHistory);
+
+      // Update donor total donations and last date
+      const updatedTotal = updatedHistory.length;
+      const updatedDate =
+        !profile.last_donation_date || logDate > profile.last_donation_date
+          ? logDate
+          : profile.last_donation_date;
+
+      await supabase
+        .from("donors")
+        .update({
+          total_donations: updatedTotal,
+          last_donation_date: updatedDate,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", profile.id);
+
+      setProfile((prev) => ({
+        ...prev,
+        total_donations: updatedTotal,
+        last_donation_date: updatedDate,
+      }));
+
+      setMessage("Donation successfully logged in your profile!");
+      setShowLogDonation(false);
+      setLogHospital("");
+      setLogPatient("");
+      setLogNotes("");
+    } catch (err) {
+      console.error("Donation log error:", err);
+      setError(err.message || "Failed to log donation.");
+    } finally {
+      setLogSaving(false);
     }
   }
 
@@ -473,6 +606,183 @@ function Profile() {
             {saving ? "Saving..." : "Save Profile"}
           </button>
         </form>
+
+        {/* My Donation History Section */}
+        <section className="mt-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors dark:border-gray-800 dark:bg-gray-900 sm:p-7">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                  My Donation History
+                </h2>
+                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700 dark:bg-red-950/70 dark:text-red-300">
+                  {donationHistory.length} Recorded
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                Track your life-saving whole blood and platelet donations.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowLogDonation((prev) => !prev)}
+              className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-xl bg-red-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-red-700 active:scale-95 transition"
+            >
+              <span>{showLogDonation ? "Cancel" : "+ Record a Donation"}</span>
+            </button>
+          </div>
+
+          {/* Form to log a donation */}
+          {showLogDonation && (
+            <form
+              onSubmit={handleLogDonation}
+              className="mt-4 rounded-xl border border-red-200 bg-red-50/40 p-4 dark:border-red-900/40 dark:bg-red-950/20 space-y-3"
+            >
+              <h3 className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
+                Add New Donation Record
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Donation Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={logDate}
+                    onChange={(e) => setLogDate(e.target.value)}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Hospital / Blood Center *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. CMCH, Parkview Hospital, Imperial Hospital"
+                    value={logHospital}
+                    onChange={(e) => setLogHospital(e.target.value)}
+                    required
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Patient / Recipient (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Emergency surgery patient"
+                    value={logPatient}
+                    onChange={(e) => setLogPatient(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Units / Bags
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={logUnits}
+                    onChange={(e) => setLogUnits(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Notes
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Platelet apheresis, replacement donation"
+                  value={logNotes}
+                  onChange={(e) => setLogNotes(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setShowLogDonation(false)}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={logSaving}
+                  className="rounded-lg bg-red-600 px-4 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-red-700 disabled:opacity-50"
+                >
+                  {logSaving ? "Saving..." : "Save to Supabase"}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Donation Timeline */}
+          <div className="mt-5">
+            {donationHistory.length > 0 ? (
+              <div className="relative border-l-2 border-red-200 pl-4 space-y-4 dark:border-red-900/60 ml-2">
+                {donationHistory.map((item, idx) => (
+                  <div key={item.id || idx} className="relative">
+                    <span className="absolute -left-[21px] top-1 flex h-2.5 w-2.5 rounded-full bg-red-600 ring-4 ring-white dark:ring-gray-900" />
+                    <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-3.5 dark:border-gray-800 dark:bg-gray-800/40">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-xs font-bold text-gray-900 dark:text-white">
+                            {item.hospital || "Blood Center"}
+                          </p>
+                          {item.patient_name && (
+                            <p className="text-[11px] text-gray-600 dark:text-gray-300">
+                              Patient: {item.patient_name}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="inline-block rounded-md bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:bg-red-950/70 dark:text-red-300">
+                            {item.donation_date}
+                          </span>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                            {item.units_donated || 1} Bag (450ml)
+                          </p>
+                        </div>
+                      </div>
+                      {item.notes && (
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200/50 pt-1.5 dark:border-gray-700/50">
+                          {item.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-6 text-center dark:border-gray-800 dark:bg-gray-800/20">
+                <span className="text-2xl">🩸</span>
+                <p className="mt-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  No recorded donations yet
+                </p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                  Click the &quot;Record a Donation&quot; button above to log your past blood donations.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </main>
   );

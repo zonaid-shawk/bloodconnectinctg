@@ -3,6 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { districts, locations } from "../data/chittagongLocations";
 import { supabase } from "../lib/supabase";
 import EmergencyRequestModal from "./EmergencyRequestModal";
+import DonorProfileModal from "./DonorProfileModal";
+import SupabaseStatusModal from "./SupabaseStatusModal";
 import Toast from "./Toast";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -65,6 +67,13 @@ export default function SearchableDonorList({
   const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+  // Individual donor profile & donation history modal state
+  const [selectedDonorProfile, setSelectedDonorProfile] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // In-app Supabase status & SQL schema modal state
+  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copiedPhone, setCopiedPhone] = useState(null);
@@ -76,7 +85,7 @@ export default function SearchableDonorList({
 
     async function load() {
       try {
-        let query = supabase.from("available_donors").select("*");
+        let query = supabase.from("donors").select("*");
 
         if (selectedBloodGroup) {
           query = query.eq("blood_group", selectedBloodGroup);
@@ -95,11 +104,22 @@ export default function SearchableDonorList({
 
         if (!active) return;
 
+        let loadedDonors = donorsRes.data;
+
+        // Fallback to available_donors view if donors table query returned an error
         if (donorsRes.error) {
-          setError("Unable to load donors. Please try again.");
-        } else {
-          setDonors(donorsRes.data || []);
+          console.warn("Retrying with available_donors view:", donorsRes.error);
+          const fallbackRes = await supabase.from("available_donors").select("*");
+          if (!fallbackRes.error && fallbackRes.data) {
+            loadedDonors = fallbackRes.data;
+          }
+        }
+
+        if (loadedDonors) {
+          setDonors(loadedDonors);
           setError("");
+        } else {
+          setError("Unable to load donors. Please try again.");
         }
 
         if (reqsRes.data) {
@@ -267,6 +287,25 @@ export default function SearchableDonorList({
         onClose={() => setToastMessage("")}
       />
 
+      {/* DONOR PROFILE & DONATION HISTORY MODAL */}
+      <DonorProfileModal
+        isOpen={isProfileModalOpen}
+        donor={selectedDonorProfile}
+        onClose={() => setIsProfileModalOpen(false)}
+        onUpdateDonor={(updated) => {
+          setSelectedDonorProfile(updated);
+          setDonors((prev) =>
+            prev.map((d) => (d.id === updated.id ? { ...d, ...updated } : d))
+          );
+        }}
+      />
+
+      {/* SUPABASE STATUS & SQL SCHEMA MODAL */}
+      <SupabaseStatusModal
+        isOpen={isDbModalOpen}
+        onClose={() => setIsDbModalOpen(false)}
+      />
+
       {/* Header */}
       {showTitle && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -280,6 +319,16 @@ export default function SearchableDonorList({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsDbModalOpen(true)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-bold text-emerald-800 shadow-xs transition hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
+              title="Inspect Supabase backend connection & database schema"
+            >
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Supabase DB</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setIsEmergencyModalOpen(true)}
@@ -718,9 +767,19 @@ export default function SearchableDonorList({
                   {/* Top Bar: Name & Blood Badge */}
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="truncate text-base font-bold text-gray-900 group-hover:text-red-700 dark:text-white dark:group-hover:text-red-400">
-                        {donor.full_name || "Anonymous Donor"}
-                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedDonorProfile(donor);
+                          setIsProfileModalOpen(true);
+                        }}
+                        className="text-left group/name block max-w-full"
+                        title="Click to view full donor profile & history"
+                      >
+                        <h3 className="truncate text-base font-bold text-gray-900 group-hover/name:text-red-600 transition dark:text-white dark:group-hover/name:text-red-400">
+                          {donor.full_name || "Anonymous Donor"}
+                        </h3>
+                      </button>
                       <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <svg className="h-3.5 w-3.5 shrink-0 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -739,12 +798,32 @@ export default function SearchableDonorList({
                     </div>
                   </div>
 
-                  {/* Availability Badge */}
-                  <div className="mt-3.5 flex items-center gap-2">
-                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-950" />
-                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                      Available to Donate
-                    </span>
+                  {/* Availability Badge & Last Donation Recency */}
+                  <div className="mt-3.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`flex h-2 w-2 rounded-full ${
+                          donor.availability
+                            ? "bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-950"
+                            : "bg-gray-400"
+                        }`}
+                      />
+                      <span
+                        className={`text-xs font-semibold ${
+                          donor.availability
+                            ? "text-emerald-700 dark:text-emerald-400"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {donor.availability ? "Available to Donate" : "Resting"}
+                      </span>
+                    </div>
+
+                    {donor.last_donation_date && (
+                      <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                        Last: {donor.last_donation_date}
+                      </span>
+                    )}
                   </div>
 
                   {/* Mobile phone display */}
@@ -767,19 +846,36 @@ export default function SearchableDonorList({
                   )}
                 </div>
 
-                {/* Bottom Action Buttons */}
+                {/* Bottom Action Buttons: View Profile + WhatsApp + Call */}
                 <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDonorProfile(donor);
+                      setIsProfileModalOpen(true);
+                    }}
+                    className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl border border-red-200 bg-red-50/70 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-100 active:scale-95 transition dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
+                    title="View donor profile & past donation history"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>View Profile</span>
+                  </button>
+
                   {waLink ? (
                     <a
                       href={waLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+                      className="inline-flex items-center justify-center gap-1 rounded-xl bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+                      title="Chat on WhatsApp"
                     >
                       <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.52 3.48A11.86 11.86 0 0 0 12.08 0C5.5 0 .15 5.34.15 11.91c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.94 11.94 0 0 0 5.78 1.47h.01c6.57 0 11.91-5.35 11.91-11.92 0-3.18-1.24-6.17-3.48-8.42ZM12.09 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.74.98.99-3.65-.24-.37a9.83 9.83 0 0 1-1.51-5.26c0-5.47 4.45-9.91 9.92-9.91a9.84 9.84 0 0 1 7.01 2.91 9.84 9.84 0 0 1 2.9 7.01c0 5.47-4.45 9.92-9.93 9.92Zm5.44-7.43c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.96 1.17-.18.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.47-1.74-1.65-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.68-1.64-.93-2.25-.24-.58-.49-.5-.68-.51l-.58-.01c-.2 0-.53.07-.81.38-.28.3-1.06 1.03-1.06 2.51 0 1.48 1.09 2.91 1.24 3.11.15.2 2.13 3.25 5.15 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.73 2.02-1.43.25-.71.25-1.31.17-1.43-.07-.13-.27-.2-.57-.35Z" />
                       </svg>
-                      <span>WhatsApp</span>
+                      <span className="hidden sm:inline">WhatsApp</span>
                     </a>
                   ) : null}
 

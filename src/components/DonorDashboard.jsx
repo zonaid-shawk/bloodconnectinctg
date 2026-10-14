@@ -82,12 +82,12 @@ export default function DonorDashboard({
   async function handleManualRefresh() {
     setLoading(true);
     try {
-      const { data, error: fetchErr } = await supabase
-        .from("profiles")
-        .select("*");
-
-      if (fetchErr) throw fetchErr;
-      setDonors(data || []);
+      let res = await supabase.from("donors").select("*");
+      if (res.error) {
+        res = await supabase.from("profiles").select("*");
+      }
+      if (res.error) throw res.error;
+      setDonors(res.data || []);
       setError("");
       setLastUpdated(new Date());
     } catch (err) {
@@ -103,13 +103,13 @@ export default function DonorDashboard({
 
     async function loadData() {
       try {
-        const { data, error: fetchErr } = await supabase
-          .from("profiles")
-          .select("*");
-
+        let res = await supabase.from("donors").select("*");
+        if (res.error) {
+          res = await supabase.from("profiles").select("*");
+        }
         if (!active) return;
-        if (fetchErr) throw fetchErr;
-        setDonors(data || []);
+        if (res.error) throw res.error;
+        setDonors(res.data || []);
         setError("");
         setLastUpdated(new Date());
       } catch (err) {
