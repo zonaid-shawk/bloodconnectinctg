@@ -4,7 +4,6 @@ import { districts, locations } from "../data/chittagongLocations";
 import { supabase } from "../lib/supabase";
 import EmergencyRequestModal from "./EmergencyRequestModal";
 import DonorProfileModal from "./DonorProfileModal";
-import SupabaseStatusModal from "./SupabaseStatusModal";
 import Toast from "./Toast";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -70,9 +69,6 @@ export default function SearchableDonorList({
   // Individual donor profile & donation history modal state
   const [selectedDonorProfile, setSelectedDonorProfile] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
-  // In-app Supabase status & SQL schema modal state
-  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -300,12 +296,6 @@ export default function SearchableDonorList({
         }}
       />
 
-      {/* SUPABASE STATUS & SQL SCHEMA MODAL */}
-      <SupabaseStatusModal
-        isOpen={isDbModalOpen}
-        onClose={() => setIsDbModalOpen(false)}
-      />
-
       {/* Header */}
       {showTitle && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -319,15 +309,6 @@ export default function SearchableDonorList({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => setIsDbModalOpen(true)}
-              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-bold text-emerald-800 shadow-xs transition hover:bg-emerald-100 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
-              title="Inspect Supabase backend connection & database schema"
-            >
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Supabase DB</span>
-            </button>
 
             <button
               type="button"

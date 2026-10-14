@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ThemeToggle from "./ThemeToggle";
-import SupabaseStatusModal from "./SupabaseStatusModal";
 
 function Navbar() {
   const [session, setSession] = useState(null);
   const [checking, setChecking] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -101,17 +99,6 @@ function Navbar() {
           >
             About
           </Link>
-
-          {/* Supabase Status Button */}
-          <button
-            type="button"
-            onClick={() => setIsDbModalOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200/90 bg-emerald-50/70 px-2.5 py-1 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100/90 active:scale-95 transition dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
-            title="Inspect Supabase backend connection & SQL schema"
-          >
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Database</span>
-          </button>
 
           {/* Theme Mode Toggle */}
           <div className="h-5 w-px bg-gray-200 dark:bg-gray-800" />
@@ -211,23 +198,6 @@ function Navbar() {
               About
             </Link>
 
-            <button
-              type="button"
-              onClick={() => {
-                setIsDbModalOpen(true);
-                setMobileMenuOpen(false);
-              }}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
-            >
-              <span className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Supabase Database & SQL</span>
-              </span>
-              <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                View
-              </span>
-            </button>
-
             <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
 
             {!checking &&
@@ -267,12 +237,6 @@ function Navbar() {
           </div>
         </div>
       )}
-
-      {/* Supabase Status & SQL Schema Modal */}
-      <SupabaseStatusModal
-        isOpen={isDbModalOpen}
-        onClose={() => setIsDbModalOpen(false)}
-      />
     </header>
   );
 }
